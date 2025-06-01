@@ -1,65 +1,86 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1>Rowery</h1>
+    <h1 style="text-align:center; color:#0a4fa3; margin-bottom:22px;">Rowery</h1>
 
-    <!-- Komunikaty o sukcesie/błędach -->
+    {{-- Komunikaty o sukcesie/błędach --}}
     @if(session('success'))
-        <div style="color: green">{{ session('success') }}</div>
+        <div style="color: #207227; background:#e9fbe5; border-radius:8px; padding:9px 18px; margin-bottom:18px; text-align:center;">
+            {{ session('success') }}
+        </div>
     @endif
     @if($errors->any())
-        <div style="color: red">
+        <div style="color: #b32a2a; background:#ffe9e9; border-radius:8px; padding:9px 18px; margin-bottom:18px; text-align:center;">
             @foreach($errors->all() as $error)
                 {{ $error }}<br>
             @endforeach
         </div>
     @endif
 
-    <!-- Formularz dodawania roweru -->
-    <form method="POST" action="{{ route('cyclesynchub.store') }}">
+    {{-- Formularz dodawania roweru --}}
+    <form method="POST" action="{{ route('cyclesynchub.store') }}" style="margin-bottom: 28px; display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
         @csrf
-        <div>
-            <input type="text" name="name" placeholder="Nazwa roweru" required>
-            <input type="text" name="type" placeholder="Typ roweru" required>
-            <input type="submit" value="Dodaj">
-        </div>
+        <input type="text" name="name" placeholder="Nazwa roweru" required style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3; min-width:140px;">
+        <input type="text" name="type" placeholder="Typ roweru" required style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3; min-width:120px;">
+        <input type="text" name="components" placeholder="Podzespoły" style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3; min-width:120px;">
+        <input type="number" step="0.1" name="weight" placeholder="Waga (kg)" style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3; min-width:100px;">
+        <input type="text" name="description" placeholder="Opis" style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3; min-width:140px;">
+        <input type="submit" value="Dodaj" style="padding:8px 24px; background:#1581e0; color:#fff; border:none; border-radius:8px; font-weight:500; cursor:pointer;">
     </form>
 
-    <!-- Lista rowerów -->
-    <table border="1" cellpadding="5">
-        <tr>
-            <th>Nazwa</th>
-            <th>Typ</th>
-            @if(auth()->user()->isAdmin() || auth()->user()->isOwner())
-                <th>Właściciel</th>
-            @endif
-            <th>Akcje</th>
-        </tr>
-        @forelse($bikes as $bike)
-            <tr>
-                <td>{{ $bike->name }}</td>
-                <td>{{ $bike->type }}</td>
-                @if(auth()->user()->isAdmin() || auth()->user()->isOwner())
-                    <td>{{ $bike->user->name ?? '-' }}</td>
-                @endif
-                <td>
-                    {{-- Edycja --}}
-                    <a href="{{ route('cyclesynchub.edit', $bike->id) }}">Edytuj</a>
-                    {{-- Usuwanie --}}
-                    <form action="{{ route('cyclesynchub.destroy', $bike->id) }}" method="POST" style="display:inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" onclick="return confirm('Usunąć rower?')">Usuń</button>
-                    </form>
-                </td>
-            </tr>
-        @empty
-            <tr>
-                <td colspan="4">Brak rowerów</td>
-            </tr>
-        @endforelse
-    </table>
+    {{-- Wyszukiwarka rowerów --}}
+    <form method="GET" action="{{ route('cyclesynchub.index') }}" style="margin-bottom:24px; text-align:center;">
+        <input type="text" name="q" placeholder="Wyszukaj rower po nazwie..." value="{{ request('q') }}"
+               style="padding:8px 16px; border-radius:8px; border:1px solid #c6daf3; width:260px;">
+        <button type="submit"
+                style="padding:8px 22px; background:#1581e0; color:#fff; border:none; border-radius:8px; font-weight:500; cursor:pointer;">
+            Szukaj
+        </button>
+    </form>
 
-    <br>
-    <a href="{{ route('home.index') }}">Home</a>
-@endsecti
+    {{-- Lista rowerów --}}
+    <div style="overflow-x:auto;">
+        <table style="margin:0 auto; border-collapse: collapse; width:100%; background:#f7faff; box-shadow:0 1px 4px #0001; border-radius:14px; overflow:hidden;">
+            <tr style="background:#eaf2fa;">
+                <th style="padding:10px 14px;">Nazwa</th>
+                <th style="padding:10px 14px;">Typ</th>
+                <th style="padding:10px 14px;">Podzespoły</th>
+                <th style="padding:10px 14px;">Waga</th>
+                <th style="padding:10px 14px;">Opis</th>
+                @if(auth()->user()->isAdmin() || auth()->user()->isOwner())
+                    <th style="padding:10px 14px;">Właściciel</th>
+                @endif
+                <th style="padding:10px 14px;">Akcje</th>
+            </tr>
+            @forelse($bikes as $bike)
+                <tr>
+                    <td style="padding:8px 12px; border-top:1px solid #e3e3e3;">{{ $bike->name }}</td>
+                    <td style="padding:8px 12px; border-top:1px solid #e3e3e3;">{{ $bike->type }}</td>
+                    <td style="padding:8px 12px; border-top:1px solid #e3e3e3;">{{ $bike->components ?? '-' }}</td>
+                    <td style="padding:8px 12px; border-top:1px solid #e3e3e3;">
+                        {{ $bike->weight ? $bike->weight.' kg' : '-' }}
+                    </td>
+                    <td style="padding:8px 12px; border-top:1px solid #e3e3e3; max-width:180px; word-break:break-word;">
+                        {{ $bike->description ?? '-' }}
+                    </td>
+                    @if(auth()->user()->isAdmin() || auth()->user()->isOwner())
+                        <td style="padding:8px 12px; border-top:1px solid #e3e3e3;">{{ $bike->user->name ?? '-' }}</td>
+                    @endif
+                    <td style="padding:8px 12px; border-top:1px solid #e3e3e3;">
+                        <a href="{{ route('cyclesynchub.show', $bike->id) }}" style="color:#15912a; text-decoration:underline; margin-right:7px;">Szczegóły</a>
+                        <a href="{{ route('cyclesynchub.edit', $bike->id) }}" style="color:#1581e0; text-decoration:underline; margin-right:7px;">Edytuj</a>
+                        <form action="{{ route('cyclesynchub.destroy', $bike->id) }}" method="POST" style="display:inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" onclick="return confirm('Usunąć rower?')" style="color:#b32a2a; background:none; border:none; text-decoration:underline; cursor:pointer;">Usuń</button>
+                        </form>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="7" style="padding:20px 0; text-align:center; color:#999;">Brak rowerów</td>
+                </tr>
+            @endforelse
+        </table>
+    </div>
+@endsection

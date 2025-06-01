@@ -11,6 +11,9 @@ class Bike extends Model
         'name',
         'type',
         'user_id',
+        'components',
+        'weight',
+        'description',
     ];
 
     // Relacja: jeden rower należy do jednego użytkownika

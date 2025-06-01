@@ -22,6 +22,11 @@
                 <a href="{{ route('cyclesynchub.index') }}" style="margin-right: 16px; font-weight: bold;">Rowery</a>
                 <a href="{{ route('home.index') }}" style="margin-right: 16px;">Strona główna</a>
                 @auth
+                    {{-- LINK WIDOCZNY TYLKO DLA ADMINA I OWNERA --}}
+                    @if(auth()->user()->isAdmin() || auth()->user()->isOwner())
+                        <a href="{{ route('users.index') }}" style="margin-right: 16px;">Użytkownicy</a>
+                    @endif
+
                     <form action="{{ route('logout') }}" method="POST" style="display:inline;">
                         @csrf
                         <button type="submit" style="background:none; border:none; color:#1d4ed8; cursor:pointer;">Wyloguj</button>
