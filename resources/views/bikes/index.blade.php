@@ -25,6 +25,13 @@
         <input type="text" name="components" placeholder="Podzespoły" style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3; min-width:120px;">
         <input type="number" step="0.1" name="weight" placeholder="Waga (kg)" style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3; min-width:100px;">
         <input type="text" name="description" placeholder="Opis" style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3; min-width:140px;">
+        <select name="status" required style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3;">
+            <option value="oczekuje">Oczekuje</option>
+            <option value="w naprawie">W naprawie</option>
+            <option value="gotowy">Gotowy</option>
+            <option value="odebrany">Odebrany</option>
+        </select>
+        <input type="date" name="deadline" placeholder="Termin" style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3;">
         <input type="submit" value="Dodaj" style="padding:8px 24px; background:#1581e0; color:#fff; border:none; border-radius:8px; font-weight:500; cursor:pointer;">
     </form>
 
@@ -47,6 +54,8 @@
                 <th style="padding:10px 14px;">Podzespoły</th>
                 <th style="padding:10px 14px;">Waga</th>
                 <th style="padding:10px 14px;">Opis</th>
+                <th style="padding:10px 14px;">Status</th>
+                <th style="padding:10px 14px;">Termin</th>
                 @if(auth()->user()->isAdmin() || auth()->user()->isOwner())
                     <th style="padding:10px 14px;">Właściciel</th>
                 @endif
@@ -63,12 +72,42 @@
                     <td style="padding:8px 12px; border-top:1px solid #e3e3e3; max-width:180px; word-break:break-word;">
                         {{ $bike->description ?? '-' }}
                     </td>
+                    <td style="padding:8px 12px; border-top:1px solid #e3e3e3;">
+                        {{ ucfirst($bike->status) }}
+                        @if($bike->status === 'gotowy')
+                            <span style="color:#14b830; font-weight:bold;">✔</span>
+                        @elseif($bike->status === 'w naprawie')
+                            <span style="color:#f39c12;">&#9888;</span>
+                        @elseif($bike->status === 'odebrany')
+                            <span style="color:#1267e0;">&#128692;</span>
+                        @endif
+                    </td>
+                    <td style="padding:8px 12px; border-top:1px solid #e3e3e3;">
+                        @if($bike->deadline)
+                            {{ \Carbon\Carbon::parse($bike->deadline)->format('d.m.Y') }}
+                            @if(\Carbon\Carbon::parse($bike->deadline)->isPast() && $bike->status != 'gotowy')
+                                <span style="color:red;">(po terminie!)</span>
+                            @endif
+                        @else
+                            -
+                        @endif
+                    </td>
                     @if(auth()->user()->isAdmin() || auth()->user()->isOwner())
                         <td style="padding:8px 12px; border-top:1px solid #e3e3e3;">{{ $bike->user->name ?? '-' }}</td>
                     @endif
                     <td style="padding:8px 12px; border-top:1px solid #e3e3e3;">
                         <a href="{{ route('cyclesynchub.show', $bike->id) }}" style="color:#15912a; text-decoration:underline; margin-right:7px;">Szczegóły</a>
                         <a href="{{ route('cyclesynchub.edit', $bike->id) }}" style="color:#1581e0; text-decoration:underline; margin-right:7px;">Edytuj</a>
+                        {{-- Odhacz jako gotowy (tylko admin/owner, jeśli NIE gotowy i NIE odebrany) --}}
+                        @if((auth()->user()->isOwner() || auth()->user()->isAdmin()) && !in_array($bike->status, ['gotowy','odebrany']))
+                            <form method="POST" action="{{ route('cyclesynchub.complete', $bike->id) }}" style="display:inline;">
+                                @csrf
+                                @method('PUT')
+                                <button type="submit" style="color:green; background:none; border:none; text-decoration:underline; cursor:pointer;">
+                                    Odhacz jako gotowy
+                                </button>
+                            </form>
+                        @endif
                         <form action="{{ route('cyclesynchub.destroy', $bike->id) }}" method="POST" style="display:inline">
                             @csrf
                             @method('DELETE')
@@ -78,7 +117,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" style="padding:20px 0; text-align:center; color:#999;">Brak rowerów</td>
+                    <td colspan="9" style="padding:20px 0; text-align:center; color:#999;">Brak rowerów</td>
                 </tr>
             @endforelse
         </table>

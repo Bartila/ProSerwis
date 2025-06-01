@@ -26,7 +26,7 @@ class CycleSyncHubController extends Controller
         return view('bikes.index', compact('bikes', 'q'));
     }
 
-    // Formularz dodawania roweru (opcjonalnie – jeśli chcesz osobny widok)
+    // Formularz dodawania roweru
     public function create()
     {
         return view('bikes.create');
@@ -41,6 +41,8 @@ class CycleSyncHubController extends Controller
             'components'  => 'nullable|string|max:255',
             'weight'      => 'nullable|numeric|min:0',
             'description' => 'nullable|string|max:1000',
+            'status'      => 'required|string|max:30',
+            'deadline'    => 'nullable|date',
         ]);
 
         Bike::create([
@@ -50,6 +52,8 @@ class CycleSyncHubController extends Controller
             'components'  => $request->components,
             'weight'      => $request->weight,
             'description' => $request->description,
+            'status'      => $request->status,
+            'deadline'    => $request->deadline,
         ]);
 
         return redirect()->route('cyclesynchub.index')->with('success', 'Rower dodany!');
@@ -97,6 +101,8 @@ class CycleSyncHubController extends Controller
             'components'  => 'nullable|string|max:255',
             'weight'      => 'nullable|numeric|min:0',
             'description' => 'nullable|string|max:1000',
+            'status'      => 'required|string|max:30',
+            'deadline'    => 'nullable|date',
         ]);
 
         $bike->update([
@@ -105,9 +111,26 @@ class CycleSyncHubController extends Controller
             'components'  => $request->components,
             'weight'      => $request->weight,
             'description' => $request->description,
+            'status'      => $request->status,
+            'deadline'    => $request->deadline,
         ]);
 
         return redirect()->route('cyclesynchub.index')->with('success', 'Rower zaktualizowany!');
+    }
+
+    // Odhacz jako gotowy (tylko admin/owner)
+    public function complete($id)
+    {
+        $bike = Bike::findOrFail($id);
+
+        $user = Auth::user();
+        if ($user->role !== 'admin' && $user->role !== 'owner') {
+            abort(403, 'Brak dostępu');
+        }
+
+        $bike->update(['status' => 'gotowy']);
+
+        return redirect()->route('cyclesynchub.index')->with('success', 'Rower odhaczony jako gotowy!');
     }
 
     // Usuwanie roweru

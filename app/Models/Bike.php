@@ -8,12 +8,14 @@ class Bike extends Model
 {
     // Pola, które można masowo przypisywać (mass assignment)
     protected $fillable = [
-        'name',
-        'type',
-        'user_id',
-        'components',
-        'weight',
-        'description',
+    'name',
+    'type',
+    'user_id',
+    'components',
+    'weight',
+    'description',
+    'status',
+    'deadline',
     ];
 
     // Relacja: jeden rower należy do jednego użytkownika
