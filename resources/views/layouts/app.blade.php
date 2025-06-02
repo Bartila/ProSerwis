@@ -84,6 +84,7 @@
     <div class="center-container">
 
         {{-- Pasek z informacją o użytkowniku --}}
+        @if (!View::hasSection('no_nav'))
         <div class="user-info">
             @if(auth()->check())
                 Zalogowany jako: <strong>{{ auth()->user()->name }}</strong> &bull; {{ auth()->user()->email }} &bull; rola: <b>{{ auth()->user()->role }}</b>
@@ -91,8 +92,10 @@
                 Nie jesteś zalogowany
             @endif
         </div>
+        @endif
 
         {{-- Nawigacja --}}
+        @if (!View::hasSection('no_nav'))
         <nav>
             <a href="{{ route('cyclesynchub.index') }}">Rowery</a>
             <a href="{{ route('home.index') }}">Strona główna</a>
@@ -110,6 +113,7 @@
                 <a href="{{ route('register') }}">Rejestracja</a>
             @endauth
         </nav>
+        @endif
 
         {{-- Nagłówek strony jeśli istnieje --}}
         @isset($header)

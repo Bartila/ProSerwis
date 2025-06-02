@@ -1,88 +1,109 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 style="text-align:center; color:#0a4fa3; margin-bottom:22px;">Rowery</h1>
+    <h1 style="text-align:center; color:#0a4fa3; margin-bottom:15px; font-size:22px;">Rowery</h1>
 
-    {{-- Komunikaty o sukcesie/błędach --}}
     @if(session('success'))
-        <div style="color: #207227; background:#e9fbe5; border-radius:8px; padding:9px 18px; margin-bottom:18px; text-align:center;">
+        <div style="color:#207227; background:#e9fbe5; border-radius:5px; padding:5px 12px; margin-bottom:12px; text-align:center;">
             {{ session('success') }}
         </div>
     @endif
     @if($errors->any())
-        <div style="color: #b32a2a; background:#ffe9e9; border-radius:8px; padding:9px 18px; margin-bottom:18px; text-align:center;">
+        <div style="color:#b32a2a; background:#ffe9e9; border-radius:5px; padding:5px 12px; margin-bottom:12px; text-align:center;">
             @foreach($errors->all() as $error)
                 {{ $error }}<br>
             @endforeach
         </div>
     @endif
+{{-- Formularz dodawania roweru --}}
+{{-- Formularz dodawania roweru --}}
+<form method="POST" action="{{ route('cyclesynchub.store') }}" style="margin-bottom:10px; display:flex; gap:4px; flex-wrap:wrap; justify-content:center;">
+    @csrf
+    <input type="text" name="name" placeholder="Nazwa" required minlength="10"
+           style="padding:2px 4px; border:1px solid #aaa; min-width:110px; font-size:13px;">
 
-    {{-- Formularz dodawania roweru --}}
-    <form method="POST" action="{{ route('cyclesynchub.store') }}" style="margin-bottom: 28px; display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
-        @csrf
-        <input type="text" name="name" placeholder="Nazwa roweru" required style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3; min-width:140px;">
-        <input type="text" name="type" placeholder="Typ roweru" required style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3; min-width:120px;">
-        <input type="text" name="components" placeholder="Podzespoły" style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3; min-width:120px;">
-        <input type="number" step="0.1" name="weight" placeholder="Waga (kg)" style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3; min-width:100px;">
-        <input type="text" name="description" placeholder="Opis" style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3; min-width:140px;">
-        <select name="status" required style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3;">
-            <option value="oczekuje">Oczekuje</option>
-            <option value="w naprawie">W naprawie</option>
-            <option value="gotowy">Gotowy</option>
-            <option value="odebrany">Odebrany</option>
-        </select>
-        <input type="date" name="deadline" placeholder="Termin" style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3;">
-        <input type="submit" value="Dodaj" style="padding:8px 24px; background:#1581e0; color:#fff; border:none; border-radius:8px; font-weight:500; cursor:pointer;">
-    </form>
+    <select name="type" required style="padding:2px 4px; border:1px solid #aaa; min-width:90px; font-size:13px;">
+        <option value="">Typ roweru</option>
+        <option value="mtb">MTB</option>
+        <option value="szosowy">Szosowy</option>
+        <option value="cross">Cross</option>
+        <option value="gravel">Gravel</option>
+        <option value="trekking">Trekking</option>
+        <option value="miejski">Miejski</option>
+    </select>
 
-    {{-- Wyszukiwarka rowerów --}}
-    <form method="GET" action="{{ route('cyclesynchub.index') }}" style="margin-bottom:24px; text-align:center;">
-        <input type="text" name="q" placeholder="Wyszukaj rower po nazwie..." value="{{ request('q') }}"
-               style="padding:8px 16px; border-radius:8px; border:1px solid #c6daf3; width:260px;">
-        <button type="submit"
-                style="padding:8px 22px; background:#1581e0; color:#fff; border:none; border-radius:8px; font-weight:500; cursor:pointer;">
-            Szukaj
-        </button>
-    </form>
+    <select name="components" required style="padding:2px 4px; border:1px solid #aaa; min-width:110px; font-size:13px;">
+        <option value="">Podzespoły</option>
+        <option value="Campagnolo">Campagnolo</option>
+        <option value="SRAM">SRAM</option>
+        <option value="Shimano">Shimano</option>
+        <option value="Microshift">Microshift</option>
+        <option value="Inne">Inne</option>
+    </select>
+    <input type="number" step="0.1" name="weight" placeholder="Waga (kg)" style="padding:2px 4px; border:1px solid #aaa; min-width:70px; font-size:13px;">
+    <input type="tel" name="description" placeholder="Nr tel" required pattern="[0-9 +()-]{9,}"
+           style="padding:2px 4px; border:1px solid #aaa; min-width:90px; font-size:13px;">
+    <select name="status" required style="padding:2px 4px; border:1px solid #aaa; font-size:13px;">
+        <option value="oczekuje">Oczekuje</option>
+        <option value="w naprawie">W naprawie</option>
+        <option value="gotowy">Gotowy</option>
+        <option value="odebrany">Odebrany</option>
+    </select>
+    <input type="date" name="deadline" placeholder="Termin" style="padding:2px 4px; border:1px solid #aaa; min-width:70px; font-size:13px;">
+    <input type="submit" value="Dodaj" style="padding:2px 8px; background:#1581e0; color:#fff; border:1px solid #1581e0; font-size:13px; cursor:pointer;">
+</form>
+
+
+
+{{-- Wyszukiwarka rowerów --}}
+<form method="GET" action="{{ route('cyclesynchub.index') }}" style="margin-bottom:6px; text-align:center;">
+    <input type="text" name="q" placeholder="Szukaj po nazwie..." value="{{ request('q') }}"
+           style="padding:2px 6px; border:1px solid #aaa; width:120px; font-size:13px;">
+    <button type="submit"
+            style="padding:2px 10px; background:#1581e0; color:#fff; border:1px solid #1581e0; font-size:13px; cursor:pointer;">
+        Szukaj
+    </button>
+</form>
+
 
     {{-- Lista rowerów --}}
     <div style="overflow-x:auto;">
-        <table style="margin:0 auto; border-collapse: collapse; width:100%; background:#f7faff; box-shadow:0 1px 4px #0001; border-radius:14px; overflow:hidden;">
-            <tr style="background:#eaf2fa;">
-                <th style="padding:10px 14px;">Nazwa</th>
-                <th style="padding:10px 14px;">Typ</th>
-                <th style="padding:10px 14px;">Podzespoły</th>
-                <th style="padding:10px 14px;">Waga</th>
-                <th style="padding:10px 14px;">Opis</th>
-                <th style="padding:10px 14px;">Status</th>
-                <th style="padding:10px 14px;">Termin</th>
+        <table style="margin:0 auto; border-collapse:collapse; width:auto; min-width:100%; font-size:14px; background:none;">
+            <tr style="background:#e3e3e3;">
+                <th style="padding:5px 8px; border:1px solid #bdbdbd;">Nazwa</th>
+                <th style="padding:5px 8px; border:1px solid #bdbdbd;">Typ</th>
+                <th style="padding:5px 8px; border:1px solid #bdbdbd;">Podzespoły</th>
+                <th style="padding:5px 8px; border:1px solid #bdbdbd;">Waga</th>
+                <th style="padding:5px 8px; border:1px solid #bdbdbd;">Opis</th>
+                <th style="padding:5px 8px; border:1px solid #bdbdbd;">Status</th>
+                <th style="padding:5px 8px; border:1px solid #bdbdbd;">Termin</th>
                 @if(auth()->user()->isAdmin() || auth()->user()->isOwner())
-                    <th style="padding:10px 14px;">Właściciel</th>
+                    <th style="padding:5px 8px; border:1px solid #bdbdbd;">Właściciel</th>
                 @endif
-                <th style="padding:10px 14px;">Akcje</th>
+                <th style="padding:5px 8px; border:1px solid #bdbdbd;">Akcje</th>
             </tr>
             @forelse($bikes as $bike)
                 <tr>
-                    <td style="padding:8px 12px; border-top:1px solid #e3e3e3;">{{ $bike->name }}</td>
-                    <td style="padding:8px 12px; border-top:1px solid #e3e3e3;">{{ $bike->type }}</td>
-                    <td style="padding:8px 12px; border-top:1px solid #e3e3e3;">{{ $bike->components ?? '-' }}</td>
-                    <td style="padding:8px 12px; border-top:1px solid #e3e3e3;">
+                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">{{ $bike->name }}</td>
+                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">{{ $bike->type }}</td>
+                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">{{ $bike->components ?? '-' }}</td>
+                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">
                         {{ $bike->weight ? $bike->weight.' kg' : '-' }}
                     </td>
-                    <td style="padding:8px 12px; border-top:1px solid #e3e3e3; max-width:180px; word-break:break-word;">
+                    <td style="padding:4px 6px; border:1px solid #d0d0d0; max-width:120px; word-break:break-word;">
                         {{ $bike->description ?? '-' }}
                     </td>
-                    <td style="padding:8px 12px; border-top:1px solid #e3e3e3;">
+                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">
                         {{ ucfirst($bike->status) }}
                         @if($bike->status === 'gotowy')
-                            <span style="color:#14b830; font-weight:bold;">✔</span>
+                            <span style="color:#14b830;">✔</span>
                         @elseif($bike->status === 'w naprawie')
                             <span style="color:#f39c12;">&#9888;</span>
                         @elseif($bike->status === 'odebrany')
                             <span style="color:#1267e0;">&#128692;</span>
                         @endif
                     </td>
-                    <td style="padding:8px 12px; border-top:1px solid #e3e3e3;">
+                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">
                         @if($bike->deadline)
                             {{ \Carbon\Carbon::parse($bike->deadline)->format('d.m.Y') }}
                             @if(\Carbon\Carbon::parse($bike->deadline)->isPast() && $bike->status != 'gotowy')
@@ -93,31 +114,30 @@
                         @endif
                     </td>
                     @if(auth()->user()->isAdmin() || auth()->user()->isOwner())
-                        <td style="padding:8px 12px; border-top:1px solid #e3e3e3;">{{ $bike->user->name ?? '-' }}</td>
+                        <td style="padding:4px 6px; border:1px solid #d0d0d0;">{{ $bike->user->name ?? '-' }}</td>
                     @endif
-                    <td style="padding:8px 12px; border-top:1px solid #e3e3e3;">
-                        <a href="{{ route('cyclesynchub.show', $bike->id) }}" style="color:#15912a; text-decoration:underline; margin-right:7px;">Szczegóły</a>
-                        <a href="{{ route('cyclesynchub.edit', $bike->id) }}" style="color:#1581e0; text-decoration:underline; margin-right:7px;">Edytuj</a>
-                        {{-- Odhacz jako gotowy (tylko admin/owner, jeśli NIE gotowy i NIE odebrany) --}}
+                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">
+                        <a href="{{ route('cyclesynchub.show', $bike->id) }}" style="color:#15912a; text-decoration:underline; margin-right:4px;">Szczegóły</a>
+                        <a href="{{ route('cyclesynchub.edit', $bike->id) }}" style="color:#1581e0; text-decoration:underline; margin-right:4px;">Edytuj</a>
                         @if((auth()->user()->isOwner() || auth()->user()->isAdmin()) && !in_array($bike->status, ['gotowy','odebrany']))
                             <form method="POST" action="{{ route('cyclesynchub.complete', $bike->id) }}" style="display:inline;">
                                 @csrf
                                 @method('PUT')
-                                <button type="submit" style="color:green; background:none; border:none; text-decoration:underline; cursor:pointer;">
-                                    Odhacz jako gotowy
+                                <button type="submit" style="color:green; background:none; border:none; text-decoration:underline; cursor:pointer; font-size:13px;">
+                                    Odhacz
                                 </button>
                             </form>
                         @endif
                         <form action="{{ route('cyclesynchub.destroy', $bike->id) }}" method="POST" style="display:inline">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" onclick="return confirm('Usunąć rower?')" style="color:#b32a2a; background:none; border:none; text-decoration:underline; cursor:pointer;">Usuń</button>
+                            <button type="submit" onclick="return confirm('Usunąć rower?')" style="color:#b32a2a; background:none; border:none; text-decoration:underline; cursor:pointer; font-size:13px;">Usuń</button>
                         </form>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="9" style="padding:20px 0; text-align:center; color:#999;">Brak rowerów</td>
+                    <td colspan="9" style="padding:10px 0; text-align:center; color:#999; border:1px solid #e0e0e0;">Brak rowerów</td>
                 </tr>
             @endforelse
         </table>
