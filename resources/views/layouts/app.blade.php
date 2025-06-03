@@ -10,122 +10,71 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-    <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         body {
-            background: #f7fafc;
-            color: #232323;
-        }
-        .center-container {
-            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+            background: #f5f5f5;
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
         }
-        nav {
-            background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 2px 8px #0001;
-            padding: 16px 32px;
-            margin: 32px 0 24px 0;
-            display: flex;
-            align-items: center;
-            gap: 16px;
+        aside {
+            width: 220px;
+            background: #e0e0e0;
+            height: 100vh;
+            padding: 20px;
+            box-shadow: 2px 0 8px #ccc;
         }
-        nav a {
-            color: #0a4fa3;
-            font-weight: 500;
+        aside a, aside form button {
+            display: block;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+            color: #000;
             text-decoration: none;
-            padding: 6px 14px;
-            border-radius: 8px;
-            transition: background .2s;
+            border-radius: 4px;
         }
-        nav a:hover {
-            background: #e7f1fb;
-        }
-        .user-info {
-            margin-bottom: 20px;
-            background: #e7f1fb;
-            color: #0a4fa3;
-            border-radius: 12px;
-            padding: 10px 28px;
-            font-size: 1.07rem;
-            box-shadow: 0 2px 8px #0001;
-            text-align: center;
+        aside a:hover, aside form button:hover {
+            background: #d0d0d0;
         }
         main {
+            flex: 1;
+            padding: 40px;
             background: #fff;
-            border-radius: 20px;
-            box-shadow: 0 2px 12px #0001;
-            padding: 32px 40px;
-            margin: 0 0 32px 0;
-            min-width: 340px;
-            max-width: 650px;
+            min-height: 100vh;
         }
-        @media (max-width: 700px) {
-            main {
-                padding: 18px 6px;
-                min-width: unset;
-                max-width: 98vw;
-            }
-            nav {
-                flex-direction: column;
-                gap: 6px;
-                padding: 12px 6px;
-            }
+        .user-info {
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            color: #444;
         }
     </style>
 </head>
-<body class="font-sans antialiased">
-    <div class="center-container">
+<body>
 
-        {{-- Pasek z informacją o użytkowniku --}}
-        @if (!View::hasSection('no_nav'))
-        <div class="user-info">
-            @if(auth()->check())
-                Zalogowany jako: <strong>{{ auth()->user()->name }}</strong> &bull; {{ auth()->user()->email }} &bull; rola: <b>{{ auth()->user()->role }}</b>
-            @else
-                Nie jesteś zalogowany
-            @endif
-        </div>
-        @endif
+    @auth
+        <aside>
+            <div class="user-info">
+                <strong>{{ auth()->user()->name }}</strong><br>
+            </div>
 
-        {{-- Nawigacja --}}
-        @if (!View::hasSection('no_nav'))
-        <nav>
-            <a href="{{ route('cyclesynchub.index') }}">Rowery</a>
             <a href="{{ route('home.index') }}">Strona główna</a>
-            @auth
-                @if(auth()->user()->isAdmin() || auth()->user()->isOwner())
-                    <a href="{{ route('users.index') }}">Użytkownicy</a>
-                @endif
+            <a href="{{ route('cyclesynchub.index') }}">Rowery</a>
+            @if(auth()->user()->isAdmin() || auth()->user()->isOwner())
+                <a href="{{ route('users.index') }}">Użytkownicy</a>
+            @endif
 
-                <form action="{{ route('logout') }}" method="POST" style="display:inline;">
-                    @csrf
-                    <button type="submit" style="background:none; border:none; color:#1d4ed8; cursor:pointer; font-weight:500; padding:6px 14px; border-radius:8px;">Wyloguj</button>
-                </form>
-            @else
-                <a href="{{ route('login') }}">Logowanie</a>
-                <a href="{{ route('register') }}">Rejestracja</a>
-            @endauth
-        </nav>
-        @endif
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" style="background:none; border:none; cursor:pointer;">Wyloguj</button>
+            </form>
+        </aside>
+    @endauth
 
-        {{-- Nagłówek strony jeśli istnieje --}}
-        @isset($header)
-            <header style="margin-bottom:24px; text-align:center;">
-                <h2 style="font-size:2rem; color:#0a4fa3;">{{ $header }}</h2>
-            </header>
-        @endisset
+    <main>
+        @yield('content')
+    </main>
 
-        {{-- Główna treść --}}
-        <main>
-            @yield('content')
-        </main>
-    </div>
 </body>
 </html>

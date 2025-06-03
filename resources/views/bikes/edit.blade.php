@@ -22,7 +22,6 @@
         <select name="status" required style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3;">
             <option value="oczekuje" {{ $bike->status == 'oczekuje' ? 'selected' : '' }}>Oczekuje</option>
             <option value="w naprawie" {{ $bike->status == 'w naprawie' ? 'selected' : '' }}>W naprawie</option>
-            <option value="gotowy" {{ $bike->status == 'gotowy' ? 'selected' : '' }}>Gotowy</option>
             <option value="odebrany" {{ $bike->status == 'odebrany' ? 'selected' : '' }}>Odebrany</option>
         </select>
         <input type="date" name="deadline" value="{{ old('deadline', $bike->deadline) }}" style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3;">

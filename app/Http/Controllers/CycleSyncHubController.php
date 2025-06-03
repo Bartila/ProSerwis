@@ -11,16 +11,14 @@ class CycleSyncHubController extends Controller
     // Wyświetlanie listy rowerów z wyszukiwaniem
     public function index(Request $request)
     {
-        $user = Auth::user();
         $q = $request->input('q');
 
         $bikesQuery = Bike::query();
-        if ($user->role !== 'admin' && $user->role !== 'owner') {
-            $bikesQuery->where('user_id', $user->id);
-        }
+
         if ($q) {
             $bikesQuery->where('name', 'like', "%{$q}%");
         }
+
         $bikes = $bikesQuery->get();
 
         return view('bikes.index', compact('bikes', 'q'));
@@ -59,41 +57,24 @@ class CycleSyncHubController extends Controller
         return redirect()->route('cyclesynchub.index')->with('success', 'Rower dodany!');
     }
 
-    // Szczegóły roweru
+    // Szczegóły roweru – widoczne dla każdego zalogowanego
     public function show($id)
     {
         $bike = Bike::findOrFail($id);
-
-        $user = Auth::user();
-        if ($user->role !== 'admin' && $user->role !== 'owner' && $bike->user_id !== $user->id) {
-            abort(403, 'Brak dostępu do tego roweru');
-        }
-
         return view('bikes.show', compact('bike'));
     }
 
-    // Formularz edycji roweru
+    // Formularz edycji roweru – dostępny dla każdego zalogowanego
     public function edit($id)
     {
         $bike = Bike::findOrFail($id);
-
-        $user = Auth::user();
-        if ($user->role !== 'admin' && $user->role !== 'owner' && $bike->user_id !== $user->id) {
-            abort(403, 'Brak dostępu do edycji tego roweru');
-        }
-
         return view('bikes.edit', compact('bike'));
     }
 
-    // Zaktualizuj rower
+    // Zaktualizuj rower – dostępne dla każdego zalogowanego
     public function update(Request $request, $id)
     {
         $bike = Bike::findOrFail($id);
-
-        $user = Auth::user();
-        if ($user->role !== 'admin' && $user->role !== 'owner' && $bike->user_id !== $user->id) {
-            abort(403, 'Brak dostępu do edycji tego roweru');
-        }
 
         $request->validate([
             'name'        => 'required|string|max:255',
@@ -118,33 +99,39 @@ class CycleSyncHubController extends Controller
         return redirect()->route('cyclesynchub.index')->with('success', 'Rower zaktualizowany!');
     }
 
-    // Odhacz jako gotowy (tylko admin/owner)
+
+    // Oznacz jako gotowy – dostępne dla każdego
     public function complete($id)
     {
         $bike = Bike::findOrFail($id);
-
-        $user = Auth::user();
-        if ($user->role !== 'admin' && $user->role !== 'owner') {
-            abort(403, 'Brak dostępu');
-        }
-
         $bike->update(['status' => 'gotowy']);
 
-        return redirect()->route('cyclesynchub.index')->with('success', 'Rower odhaczony jako gotowy!');
+        return redirect()->route('cyclesynchub.index')->with('success', 'Rower oznaczony jako gotowy!');
     }
 
-    // Usuwanie roweru
+
+    // Usuwanie roweru (tylko admin/owner)
     public function destroy($id)
     {
         $bike = Bike::findOrFail($id);
 
         $user = Auth::user();
-        if ($user->role !== 'admin' && $user->role !== 'owner' && $bike->user_id !== $user->id) {
-            abort(403, 'Brak dostępu do usuwania tego roweru');
+        if ($user->role !== 'admin' && $user->role !== 'owner') {
+            abort(403, 'Brak dostępu do usuwania roweru');
         }
 
         $bike->delete();
 
         return redirect()->route('cyclesynchub.index')->with('success', 'Rower usunięty!');
     }
+
+    // Oznacz jako odebrany – dostępne dla każdego
+    public function markAsCollected($id)
+    {
+        $bike = Bike::findOrFail($id);
+        $bike->update(['status' => 'odebrany']);
+
+        return redirect()->route('cyclesynchub.index')->with('success', 'Rower oznaczony jako odebrany!');
+    }
+
 }

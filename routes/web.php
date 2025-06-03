@@ -4,6 +4,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CycleSyncHubController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\BikeTypeController;
+use App\Http\Controllers\BikeComponentController;
 
 // Strona startowa
 Route::get('/', function () {
@@ -14,6 +16,8 @@ Route::get('/', function () {
 Route::middleware(['auth', 'role:admin,owner'])->group(function () {
     Route::resource('users', UserController::class)->only(['index', 'create', 'store', 'destroy']);
 });
+
+
 
 // Grupa tras do rowerów (CRUD), tylko dla zalogowanych
 Route::middleware(['auth'])
@@ -27,6 +31,7 @@ Route::middleware(['auth'])
         Route::get('/{bike}', 'show')->name('show');
         Route::put('/{bike}', 'update')->name('update');
         Route::delete('/{bike}', 'destroy')->name('destroy');
+        Route::put('/collected/{bike}', 'markAsCollected')->name('collected');
         Route::put('/complete/{bike}', 'complete')->name('complete'); // <<<<<< POPRAWNA TRASA!
     });
 

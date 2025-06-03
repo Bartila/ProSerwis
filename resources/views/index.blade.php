@@ -15,14 +15,12 @@
         </p>
 
         <nav style="display:flex; gap:18px; margin-bottom:20px;">
-            <a href="{{ route('cyclesynchub.index') }}" style="color:#1581e0; text-decoration:underline; font-weight:500;">
-                Rowery
-            </a>
+
             @auth
                 <form action="{{ route('logout') }}" method="POST" style="display:inline;">
                     @csrf
                     <button type="submit" style="background:none; border:none; color:#b32a2a; cursor:pointer; font-weight:500;">
-                        Wyloguj
+
                     </button>
                 </form>
             @else
@@ -30,14 +28,14 @@
                     Logowanie
                 </a>
                 <a href="{{ route('register') }}" style="color:#1581e0; text-decoration:underline; font-weight:500;">
-                    Rejestracja
+
                 </a>
             @endauth
         </nav>
 
         @guest
             <div style="margin-top:18px; color:#888; text-align:center;">
-                Zaloguj się lub zarejestruj, aby korzystać z pełni funkcjonalności aplikacji.
+                Zaloguj się, aby korzystać z pełni funkcjonalności aplikacji.
             </div>
         @endguest
     </div>

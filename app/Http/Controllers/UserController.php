@@ -54,7 +54,7 @@ class UserController extends Controller // <-- ZMIEN TO!
         $user = User::findOrFail($id);
 
         // Nie pozwól usunąć samego siebie lub ownera (opcjonalnie)
-        if (auth()->id() == $user->id || $user->role == 'owner') {
+        if (auth() == $user->id || $user->role == 'owner') {
             return redirect()->route('users.index')->with('error', 'Nie można usunąć tego użytkownika!');
         }
 
