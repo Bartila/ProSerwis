@@ -1,34 +1,52 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 style="text-align:center; color:#0a4fa3; margin-bottom:22px;">Edytuj rower</h1>
+    <h1 style="text-align:center; color:#0a4fa3; margin-bottom:15px; font-size:22px;">Edytuj rower</h1>
 
     @if($errors->any())
-        <div style="color: #b32a2a; background:#ffe9e9; border-radius:8px; padding:9px 18px; margin-bottom:18px; text-align:center;">
+        <div style="color:#b32a2a; background:#ffe9e9; border-radius:5px; padding:5px 12px; margin-bottom:12px; text-align:center;">
             @foreach($errors->all() as $error)
                 {{ $error }}<br>
             @endforeach
         </div>
     @endif
 
-    <form method="POST" action="{{ route('cyclesynchub.update', $bike->id) }}" style="margin-bottom: 32px; display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+    <form method="POST" action="{{ route('cyclesynchub.update', $bike->id) }}" style="display:flex; gap:4px; flex-wrap:wrap; justify-content:center;">
         @csrf
         @method('PUT')
-        <input type="text" name="name" value="{{ old('name', $bike->name) }}" placeholder="Nazwa roweru" required style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3; min-width:140px;">
-        <input type="text" name="type" value="{{ old('type', $bike->type) }}" placeholder="Typ roweru" required style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3; min-width:120px;">
-        <input type="text" name="components" value="{{ old('components', $bike->components) }}" placeholder="Podzespoły" style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3; min-width:120px;">
-        <input type="number" step="0.1" name="weight" value="{{ old('weight', $bike->weight) }}" placeholder="Waga (kg)" style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3; min-width:100px;">
-        <input type="text" name="description" value="{{ old('description', $bike->description) }}" placeholder="Opis" style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3; min-width:140px;">
-        <select name="status" required style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3;">
-            <option value="oczekuje" {{ $bike->status == 'oczekuje' ? 'selected' : '' }}>Oczekuje</option>
-            <option value="w naprawie" {{ $bike->status == 'w naprawie' ? 'selected' : '' }}>W naprawie</option>
-            <option value="odebrany" {{ $bike->status == 'odebrany' ? 'selected' : '' }}>Odebrany</option>
-        </select>
-        <input type="date" name="deadline" value="{{ old('deadline', $bike->deadline) }}" style="padding:8px 12px; border-radius:8px; border:1px solid #c6daf3;">
-        <input type="submit" value="Zapisz" style="padding:8px 24px; background:#1581e0; color:#fff; border:none; border-radius:8px; font-weight:500; cursor:pointer;">
-    </form>
 
-    <div style="text-align:center;">
-        <a href="{{ route('cyclesynchub.index') }}" style="color:#0a4fa3; text-decoration:underline;">Wróć do listy rowerów</a>
-    </div>
+        <input type="text" name="name" value="{{ old('name', $bike->name) }}" placeholder="Nazwa" required maxlength="10"
+               style="padding:2px 4px; border:1px solid #aaa; min-width:110px; font-size:13px;">
+
+        <select name="type" required style="padding:2px 4px; border:1px solid #aaa; min-width:90px; font-size:13px;">
+            <option value="">Typ roweru</option>
+            @foreach(['mtb', 'szosowy', 'cross', 'gravel', 'trekking', 'miejski'] as $type)
+                <option value="{{ $type }}" {{ old('type', $bike->type) === $type ? 'selected' : '' }}>{{ ucfirst($type) }}</option>
+            @endforeach
+        </select>
+
+        <select name="components" required style="padding:2px 4px; border:1px solid #aaa; min-width:110px; font-size:13px;">
+            <option value="">Podzespoły</option>
+            @foreach(['Campagnolo', 'SRAM', 'Shimano', 'Microshift', 'Inne'] as $comp)
+                <option value="{{ $comp }}" {{ old('components', $bike->components) === $comp ? 'selected' : '' }}>{{ $comp }}</option>
+            @endforeach
+        </select>
+
+        <input type="number" step="0.1" name="weight" value="{{ old('weight', $bike->weight) }}" placeholder="Waga (kg)"
+               style="padding:2px 4px; border:1px solid #aaa; min-width:70px; font-size:13px;">
+
+        <input type="tel" name="description" value="{{ old('description', $bike->description) }}" placeholder="Imię" required pattern="[0-9 +()-]{9,}"
+               style="padding:2px 4px; border:1px solid #aaa; min-width:90px; font-size:13px;">
+
+        <select name="status" required style="padding:2px 4px; border:1px solid #aaa; font-size:13px;">
+            @foreach(['oczekuje', 'w naprawie', 'gotowy', 'odebrany'] as $status)
+                <option value="{{ $status }}" {{ old('status', $bike->status) === $status ? 'selected' : '' }}>{{ ucfirst($status) }}</option>
+            @endforeach
+        </select>
+
+        <input type="date" name="deadline" value="{{ old('deadline', $bike->deadline) }}" placeholder="Termin"
+               style="padding:2px 4px; border:1px solid #aaa; min-width:70px; font-size:13px;">
+
+        <input type="submit" value="Zapisz zmiany" style="padding:2px 8px; background:#1581e0; color:#fff; border:1px solid #1581e0; font-size:13px; cursor:pointer;">
+    </form>
 @endsection

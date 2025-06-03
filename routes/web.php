@@ -14,8 +14,11 @@ Route::get('/', function () {
 })->name('home.index');
 
 // Panel użytkowników (tylko admin/owner)
-Route::middleware(['auth', 'role:admin,owner'])->group(function () {
+    Route::middleware(['auth', 'role:admin,owner'])->group(function () {
     Route::resource('users', UserController::class)->only(['index', 'create', 'store', 'destroy']);
+    Route::get('users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+    Route::put('users/{user}', [UserController::class, 'update'])->name('users.update');
+
 });
 
 

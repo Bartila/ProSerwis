@@ -1,42 +1,61 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1>Użytkownicy</h1>
+    <h1 style="text-align:center; color:#0a4fa3; margin-bottom:15px; font-size:22px;">Użytkownicy</h1>
+
     @if(session('success'))
-        <div style="color: green">{{ session('success') }}</div>
+        <div style="color:#207227; background:#e9fbe5; border-radius:5px; padding:5px 12px; margin-bottom:12px; text-align:center;">
+            {{ session('success') }}
+        </div>
     @endif
+
     @if(session('error'))
-        <div style="color: red">{{ session('error') }}</div>
+        <div style="color:#b32a2a; background:#ffe9e9; border-radius:5px; padding:5px 12px; margin-bottom:12px; text-align:center;">
+            {{ session('error') }}
+        </div>
     @endif
 
-    <a href="{{ route('users.create') }}">Dodaj nowego użytkownika</a>
+    <div style="margin-bottom:14px; text-align:center;">
+        <a href="{{ route('users.create') }}" style="color:#1581e0; text-decoration:underline; font-weight:500;">
+            Dodaj nowego użytkownika
+        </a>
+    </div>
 
-    <table border="1" cellpadding="5" style="margin-top:10px;">
-        <tr>
-            <th>ID</th>
-            <th>Nazwa</th>
-            <th>Email</th>
-            <th>Rola</th>
-            <th>Akcje</th>
-        </tr>
-        @foreach($users as $user)
-            <tr>
-                <td>{{ $user->id }}</td>
-                <td>{{ $user->name }}</td>
-                <td>{{ $user->email }}</td>
-                <td>{{ $user->role }}</td>
-                <td>
-                    @if(auth()->id() != $user->id && $user->role != 'owner')
-                        <form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display:inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" onclick="return confirm('Na pewno usunąć użytkownika?')">Usuń</button>
-                        </form>
-                    @else
-                        -
-                    @endif
-                </td>
+    <div style="overflow-x:auto;">
+        <table style="margin:0 auto; border-collapse:collapse; width:auto; min-width:100%; font-size:14px;">
+            <tr style="background:#e3e3e3;">
+                <th style="padding:5px 8px; border:1px solid #bdbdbd;">ID</th>
+                <th style="padding:5px 8px; border:1px solid #bdbdbd;">Nazwa</th>
+                <th style="padding:5px 8px; border:1px solid #bdbdbd;">Email</th>
+                <th style="padding:5px 8px; border:1px solid #bdbdbd;">Rola</th>
+                <th style="padding:5px 8px; border:1px solid #bdbdbd;">Akcje</th>
             </tr>
-        @endforeach
-    </table>
+            @foreach($users as $user)
+                <tr>
+                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">{{ $user->id }}</td>
+                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">{{ $user->name }}</td>
+                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">{{ $user->email }}</td>
+                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">{{ ucfirst($user->role) }}</td>
+                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">
+                        @if(auth()->user()->role === 'admin' || (auth()->user()->role === 'owner' && $user->role !== 'admin'))
+                            <a href="{{ route('users.edit', $user->id) }}" style="color:#1581e0; text-decoration:underline; margin-right:6px;">Edytuj</a>
+                        @endif
+
+                        @if(auth()->user()->id !== $user->id && (
+                            (auth()->user()->role === 'admin') ||
+                            (auth()->user()->role === 'owner' && $user->role === 'user')
+                        ))
+                            <form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" onclick="return confirm('Usunąć użytkownika?')" style="color:#b32a2a; background:none; border:none; text-decoration:underline; cursor:pointer; font-size:13px;">
+                                    Usuń
+                                </button>
+                            </form>
+                        @endif
+                    </td>
+                </tr>
+            @endforeach
+        </table>
+    </div>
 @endsection

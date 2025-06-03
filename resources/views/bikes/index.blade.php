@@ -19,7 +19,7 @@
     {{-- Formularz dodawania roweru --}}
     <form method="POST" action="{{ route('cyclesynchub.store') }}" style="margin-bottom:10px; display:flex; gap:4px; flex-wrap:wrap; justify-content:center;">
         @csrf
-        <input type="text" name="name" placeholder="Nazwa" required minlength="10" style="padding:2px 4px; border:1px solid #aaa; min-width:110px; font-size:13px;">
+        <input type="text" name="name" placeholder="Nazwa" required maxlength="10" style="padding:2px 4px; border:1px solid #aaa; min-width:110px; font-size:13px;">
         <select name="type" required style="padding:2px 4px; border:1px solid #aaa; min-width:90px; font-size:13px;">
             <option value="">Typ roweru</option>
             <option value="mtb">MTB</option>
@@ -38,11 +38,10 @@
             <option value="Inne">Inne</option>
         </select>
         <input type="number" step="0.1" name="weight" placeholder="Waga (kg)" style="padding:2px 4px; border:1px solid #aaa; min-width:70px; font-size:13px;">
-        <input type="tel" name="description" placeholder="Imię i nazwisko" required pattern="[0-9 +()-]{9,}" style="padding:2px 4px; border:1px solid #aaa; min-width:90px; font-size:13px;">
+        <input type="tel" name="description" placeholder="Imię" required pattern="[0-9 +()-]{9,}" style="padding:2px 4px; border:1px solid #aaa; min-width:90px; font-size:13px;">
         <select name="status" required style="padding:2px 4px; border:1px solid #aaa; font-size:13px;">
             <option value="oczekuje">Oczekuje</option>
             <option value="w naprawie">W naprawie</option>
-            <option value="odebrany">Odebrany</option>
         </select>
         <input type="date" name="deadline" placeholder="Termin" style="padding:2px 4px; border:1px solid #aaa; min-width:70px; font-size:13px;">
         <input type="submit" value="Dodaj" style="padding:2px 8px; background:#1581e0; color:#fff; border:1px solid #1581e0; font-size:13px; cursor:pointer;">
@@ -64,7 +63,7 @@
                 <th style="padding:5px 8px; border:1px solid #bdbdbd;">Typ</th>
                 <th style="padding:5px 8px; border:1px solid #bdbdbd;">Podzespoły</th>
                 <th style="padding:5px 8px; border:1px solid #bdbdbd;">Waga</th>
-                <th style="padding:5px 8px; border:1px solid #bdbdbd;">Opis</th>
+                <th style="padding:5px 8px; border:1px solid #bdbdbd;">Imię</th>
                 <th style="padding:5px 8px; border:1px solid #bdbdbd;">Status</th>
                 <th style="padding:5px 8px; border:1px solid #bdbdbd;">Termin</th>
                 @if(auth()->user()->isAdmin() || auth()->user()->isOwner())

@@ -9,9 +9,8 @@
             Witaj w <span style="font-weight:bold;">CycleSyncHub</span>!
         </h1>
         <p style="font-size:1.1rem; color:#333; max-width:480px; text-align:center; margin-bottom:28px;">
-            Twoja platforma do zarządzania rowerami i podzespołami.<br>
-            Dodawaj, edytuj i przeglądaj rowery oraz ich detale!<br>
-            Dołącz do społeczności lub zarządzaj jako admin/owner.
+            Twoja platforma do zarządzania serwisem rowerów
+
         </p>
 
         <nav style="display:flex; gap:18px; margin-bottom:20px;">
