@@ -13,15 +13,20 @@ class OwnerPanelController extends Controller
             abort(403, 'Brak dostępu');
         }
 
+        $bikes = Bike::with('user')->get();
+
         $stats = [
-            'total'     => Bike::count(),
-            'ready'     => Bike::where('status', 'gotowy')->count(),
-            'inRepair'  => Bike::where('status', 'w naprawie')->count(),
-            'waiting'   => Bike::where('status', 'oczekuje')->count(),
-            'collected' => Bike::where('status', 'odebrany')->count(), // ⬅️ dodane
+            'total'     => $bikes->count(),
+            'gotowy'    => $bikes->where('status', 'gotowy')->count(),
+            'naprawa'   => $bikes->where('status', 'w naprawie')->count(),
+            'oczekuje'  => $bikes->where('status', 'oczekuje')->count(),
+            'odebrany'  => $bikes->where('status', 'odebrany')->count(),
         ];
 
-        return view('owner.panel', compact('stats'));
-    }
+        $overdueBikes = $bikes->filter(function ($bike) {
+            return $bike->deadline && $bike->deadline < now() && $bike->status !== 'gotowy';
+        });
 
+        return view('owner.panel', compact('stats', 'overdueBikes'));
+    }
 }

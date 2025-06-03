@@ -140,20 +140,5 @@ class CycleSyncHubController extends Controller
         return redirect()->route('cyclesynchub.index')->with('success', 'Rower usunięty!');
     }
 
-    public function ownerPanel()
-    {
-        $this->authorize('view-owner-panel'); // opcjonalnie, dla spójności z politykami
-
-        $bikes = Bike::all();
-        $stats = [
-            'total'     => $bikes->count(),
-            'gotowy'    => $bikes->where('status', 'gotowy')->count(),
-            'naprawa'   => $bikes->where('status', 'w naprawie')->count(),
-            'oczekuje'  => $bikes->where('status', 'oczekuje')->count(),
-            'odebrany'  => $bikes->where('status', 'odebrany')->count(),
-        ];
-
-        return view('owner.panel', compact('stats'));
-    }
 
 }
