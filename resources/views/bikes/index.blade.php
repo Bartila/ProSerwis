@@ -38,7 +38,7 @@
             <option value="Inne">Inne</option>
         </select>
         <input type="number" step="0.1" name="weight" placeholder="Waga (kg)" style="padding:2px 4px; border:1px solid #aaa; min-width:70px; font-size:13px;">
-        <input type="tel" name="description" placeholder="Nr tel" required pattern="[0-9 +()-]{9,}" style="padding:2px 4px; border:1px solid #aaa; min-width:90px; font-size:13px;">
+        <input type="tel" name="description" placeholder="Imię i nazwisko" required pattern="[0-9 +()-]{9,}" style="padding:2px 4px; border:1px solid #aaa; min-width:90px; font-size:13px;">
         <select name="status" required style="padding:2px 4px; border:1px solid #aaa; font-size:13px;">
             <option value="oczekuje">Oczekuje</option>
             <option value="w naprawie">W naprawie</option>
@@ -82,11 +82,11 @@
                     <td style="padding:4px 6px; border:1px solid #d0d0d0;">
                         {{ ucfirst($bike->status) }}
                         @if($bike->status === 'gotowy')
-                            <span style="color:#14b830;">✔</span>
+                            <span style="color:#14b830;"></span>
                         @elseif($bike->status === 'w naprawie')
-                            <span style="color:#f39c12;">&#9888;</span>
+                            <span style="color:#f39c12;"></span>
                         @elseif($bike->status === 'odebrany')
-                            <span style="color:#1267e0;">&#128692;</span>
+                            <span style="color:#1267e0;"></span>
                         @endif
                     </td>
                     <td style="padding:4px 6px; border:1px solid #d0d0d0;">

@@ -53,28 +53,33 @@
 </head>
 <body>
 
-    @auth
-        <aside>
-            <div class="user-info">
-                <strong>{{ auth()->user()->name }}</strong><br>
-            </div>
+@auth
+    <aside>
+        <div class="user-info">
+            <strong>{{ auth()->user()->name }}</strong><br>
+        </div>
 
-            <a href="{{ route('home.index') }}">Strona główna</a>
-            <a href="{{ route('cyclesynchub.index') }}">Rowery</a>
-            @if(auth()->user()->isAdmin() || auth()->user()->isOwner())
-                <a href="{{ route('users.index') }}">Użytkownicy</a>
-            @endif
+        <a href="{{ route('home.index') }}">Strona główna</a>
+        <a href="{{ route('cyclesynchub.index') }}">Rowery</a>
 
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" style="background:none; border:none; cursor:pointer;">Wyloguj</button>
-            </form>
-        </aside>
-    @endauth
+        @if(auth()->user()?->role === 'owner')
+            <a href="{{ route('owner.panel') }}">Panel właściciela</a>
+        @endif
 
-    <main>
-        @yield('content')
-    </main>
+        @if(auth()->user()->isAdmin() || auth()->user()->isOwner())
+            <a href="{{ route('users.index') }}">Użytkownicy</a>
+        @endif
+
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" style="background:none; border:none; cursor:pointer;">Wyloguj</button>
+        </form>
+    </aside>
+@endauth
+
+<main>
+    @yield('content')
+</main>
 
 </body>
 </html>

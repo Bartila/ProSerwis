@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\Bike;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CycleSyncHubController extends Controller
 {
-    // Wyświetlanie listy rowerów z wyszukiwaniem
+    // Wyświetlanie listy rowerów z opcją wyszukiwania
     public function index(Request $request)
     {
         $q = $request->input('q');
@@ -19,7 +20,8 @@ class CycleSyncHubController extends Controller
             $bikesQuery->where('name', 'like', "%{$q}%");
         }
 
-        $bikes = $bikesQuery->get();
+        // Załaduj relację 'user' dla każdego roweru
+        $bikes = $bikesQuery->with('user')->get();
 
         return view('bikes.index', compact('bikes', 'q'));
     }
@@ -30,7 +32,7 @@ class CycleSyncHubController extends Controller
         return view('bikes.create');
     }
 
-    // Dodanie nowego roweru
+    // Dodawanie nowego roweru
     public function store(Request $request)
     {
         $request->validate([
@@ -60,6 +62,7 @@ class CycleSyncHubController extends Controller
     // Szczegóły roweru – widoczne dla każdego zalogowanego
     public function show($id)
     {
+        /** @var \App\Models\Bike $bike */
         $bike = Bike::findOrFail($id);
         return view('bikes.show', compact('bike'));
     }
@@ -67,13 +70,15 @@ class CycleSyncHubController extends Controller
     // Formularz edycji roweru – dostępny dla każdego zalogowanego
     public function edit($id)
     {
+        /** @var \App\Models\Bike $bike */
         $bike = Bike::findOrFail($id);
         return view('bikes.edit', compact('bike'));
     }
 
-    // Zaktualizuj rower – dostępne dla każdego zalogowanego
+    // Aktualizacja roweru – dostępna dla każdego zalogowanego
     public function update(Request $request, $id)
     {
+        /** @var \App\Models\Bike $bike */
         $bike = Bike::findOrFail($id);
 
         $request->validate([
@@ -99,20 +104,30 @@ class CycleSyncHubController extends Controller
         return redirect()->route('cyclesynchub.index')->with('success', 'Rower zaktualizowany!');
     }
 
-
-    // Oznacz jako gotowy – dostępne dla każdego
+    // Oznacz rower jako "gotowy" – dostępne dla każdego
     public function complete($id)
     {
+        /** @var \App\Models\Bike $bike */
         $bike = Bike::findOrFail($id);
         $bike->update(['status' => 'gotowy']);
 
         return redirect()->route('cyclesynchub.index')->with('success', 'Rower oznaczony jako gotowy!');
     }
 
+    // Oznacz rower jako "odebrany" – dostępne dla każdego
+    public function markAsCollected($id)
+    {
+        /** @var \App\Models\Bike $bike */
+        $bike = Bike::findOrFail($id);
+        $bike->update(['status' => 'odebrany']);
 
-    // Usuwanie roweru (tylko admin/owner)
+        return redirect()->route('cyclesynchub.index')->with('success', 'Rower oznaczony jako odebrany!');
+    }
+
+    // Usuwanie roweru – tylko dla admina lub ownera
     public function destroy($id)
     {
+        /** @var \App\Models\Bike $bike */
         $bike = Bike::findOrFail($id);
 
         $user = Auth::user();
@@ -125,13 +140,20 @@ class CycleSyncHubController extends Controller
         return redirect()->route('cyclesynchub.index')->with('success', 'Rower usunięty!');
     }
 
-    // Oznacz jako odebrany – dostępne dla każdego
-    public function markAsCollected($id)
+    public function ownerPanel()
     {
-        $bike = Bike::findOrFail($id);
-        $bike->update(['status' => 'odebrany']);
+        $this->authorize('view-owner-panel'); // opcjonalnie, dla spójności z politykami
 
-        return redirect()->route('cyclesynchub.index')->with('success', 'Rower oznaczony jako odebrany!');
+        $bikes = Bike::all();
+        $stats = [
+            'total'     => $bikes->count(),
+            'gotowy'    => $bikes->where('status', 'gotowy')->count(),
+            'naprawa'   => $bikes->where('status', 'w naprawie')->count(),
+            'oczekuje'  => $bikes->where('status', 'oczekuje')->count(),
+            'odebrany'  => $bikes->where('status', 'odebrany')->count(),
+        ];
+
+        return view('owner.panel', compact('stats'));
     }
 
 }
