@@ -11,6 +11,7 @@ class Bike extends Model
     'name',
     'type',
     'user_id',
+    'phone',
     'components',
     'weight',
     'description',

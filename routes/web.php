@@ -14,19 +14,16 @@ Route::get('/', function () {
 })->name('home.index');
 
 // Panel użytkowników (tylko admin/owner)
-    Route::middleware(['auth', 'role:admin,owner'])->group(function () {
+Route::middleware(['auth', 'role:admin,owner'])->group(function () {
     Route::resource('users', UserController::class)->only(['index', 'create', 'store', 'destroy']);
     Route::get('users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('users/{user}', [UserController::class, 'update'])->name('users.update');
-
 });
 
-
-
+// Panel właściciela
 Route::middleware(['auth'])->group(function () {
     Route::get('/owner-panel', [OwnerPanelController::class, 'index'])->name('owner.panel');
 });
-
 
 // Grupa tras do rowerów (CRUD), tylko dla zalogowanych
 Route::middleware(['auth'])
@@ -41,9 +38,11 @@ Route::middleware(['auth'])
         Route::put('/{bike}', 'update')->name('update');
         Route::delete('/{bike}', 'destroy')->name('destroy');
         Route::put('/collected/{bike}', 'markAsCollected')->name('collected');
-        Route::put('/complete/{bike}', 'complete')->name('complete'); // <<<<<< POPRAWNA TRASA!
+        Route::put('/complete/{bike}', 'complete')->name('complete');
         Route::get('/owner-panel', [CycleSyncHubController::class, 'ownerPanel'])->name('owner.panel')->middleware('role:owner');
 
+        // 🔴 NOWA TRASA: Usuwanie wszystkich rowerów odebranych (tylko dla właściciela)
+        Route::delete('/collected/delete-all', 'destroyCollected')->name('destroyCollected')->middleware('role:owner');
     });
 
 // Dashboard (domyślnie z Breeze lub Jetstream)

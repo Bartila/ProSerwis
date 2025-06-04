@@ -43,8 +43,12 @@
             <select name="role" id="role" required
                     style="width:100%; padding:6px; border:1px solid #aaa; border-radius:4px;">
                 <option value="user">User</option>
-                <option value="admin">Admin</option>
-                <option value="owner">Owner</option>
+                @if(auth()->user()->role === 'admin')
+                    <option value="admin">Admin</option>
+                    <option value="owner">Owner</option>
+                @elseif(auth()->user()->role === 'owner')
+                    <option value="owner">Owner</option>
+                @endif
             </select>
         </div>
 

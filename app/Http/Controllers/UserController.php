@@ -27,6 +27,11 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+        // Owner nie może tworzyć admina
+        if (auth()->user()->role === 'owner' && $request->role === 'admin') {
+            return redirect()->route('users.index')->with('error', 'Owner nie może tworzyć użytkownika z rolą admin.');
+        }
+
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users',
@@ -46,7 +51,7 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        // Admin może edytować każdego, Owner nie może edytować admina
+        // Owner nie może edytować admina
         if (auth()->user()->role === 'owner' && $user->role === 'admin') {
             return redirect()->route('users.index')->with('error', 'Owner nie może edytować administratora!');
         }

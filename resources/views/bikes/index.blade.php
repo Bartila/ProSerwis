@@ -8,6 +8,7 @@
             {{ session('success') }}
         </div>
     @endif
+
     @if($errors->any())
         <div style="color:#b32a2a; background:#ffe9e9; border-radius:5px; padding:5px 12px; margin-bottom:12px; text-align:center;">
             @foreach($errors->all() as $error)
@@ -38,7 +39,8 @@
             <option value="Inne">Inne</option>
         </select>
         <input type="number" step="0.1" name="weight" placeholder="Waga (kg)" style="padding:2px 4px; border:1px solid #aaa; min-width:70px; font-size:13px;">
-        <input type="tel" name="description" placeholder="Imię" required pattern="[0-9 +()-]{9,}" style="padding:2px 4px; border:1px solid #aaa; min-width:90px; font-size:13px;">
+        <input type="text" name="description" placeholder="Imię i nazwisko" required style="padding:2px 4px; border:1px solid #aaa; min-width:100px; font-size:13px;">
+        <input type="tel" name="phone" placeholder="+48XXXXXXXXX" pattern="^\+48\d{9}$" required style="padding:2px 4px; border:1px solid #aaa; min-width:120px; font-size:13px;">
         <select name="status" required style="padding:2px 4px; border:1px solid #aaa; font-size:13px;">
             <option value="oczekuje">Oczekuje</option>
             <option value="w naprawie">W naprawie</option>
@@ -57,13 +59,9 @@
 
     {{-- Lista rowerów --}}
     <div style="overflow-x:auto;">
-        <table style="margin:0 auto; border-collapse:collapse; width:auto; min-width:100%; font-size:14px; background:none;">
+        <table style="margin:0 auto; border-collapse:collapse; width:auto; min-width:100%; font-size:14px;">
             <tr style="background:#e3e3e3;">
                 <th style="padding:5px 8px; border:1px solid #bdbdbd;">Nazwa</th>
-                <th style="padding:5px 8px; border:1px solid #bdbdbd;">Typ</th>
-                <th style="padding:5px 8px; border:1px solid #bdbdbd;">Podzespoły</th>
-                <th style="padding:5px 8px; border:1px solid #bdbdbd;">Waga</th>
-                <th style="padding:5px 8px; border:1px solid #bdbdbd;">Imię</th>
                 <th style="padding:5px 8px; border:1px solid #bdbdbd;">Status</th>
                 <th style="padding:5px 8px; border:1px solid #bdbdbd;">Termin</th>
                 @if(auth()->user()->isAdmin() || auth()->user()->isOwner())
@@ -74,10 +72,6 @@
             @forelse($bikes as $bike)
                 <tr>
                     <td style="padding:4px 6px; border:1px solid #d0d0d0;">{{ $bike->name }}</td>
-                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">{{ $bike->type }}</td>
-                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">{{ $bike->components ?? '-' }}</td>
-                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">{{ $bike->weight ? $bike->weight.' kg' : '-' }}</td>
-                    <td style="padding:4px 6px; border:1px solid #d0d0d0; max-width:120px; word-break:break-word;">{{ $bike->description ?? '-' }}</td>
                     <td style="padding:4px 6px; border:1px solid #d0d0d0;">
                         {{ ucfirst($bike->status) }}
                         @if($bike->status === 'gotowy')
@@ -132,7 +126,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="9" style="padding:10px 0; text-align:center; color:#999; border:1px solid #e0e0e0;">Brak rowerów</td>
+                    <td colspan="5" style="padding:10px 0; text-align:center; color:#999; border:1px solid #e0e0e0;">Brak rowerów</td>
                 </tr>
             @endforelse
         </table>

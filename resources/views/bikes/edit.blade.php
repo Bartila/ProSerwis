@@ -35,8 +35,12 @@
         <input type="number" step="0.1" name="weight" value="{{ old('weight', $bike->weight) }}" placeholder="Waga (kg)"
                style="padding:2px 4px; border:1px solid #aaa; min-width:70px; font-size:13px;">
 
-        <input type="tel" name="description" value="{{ old('description', $bike->description) }}" placeholder="Imię" required pattern="[0-9 +()-]{9,}"
-               style="padding:2px 4px; border:1px solid #aaa; min-width:90px; font-size:13px;">
+        <input type="text" name="description" value="{{ old('description', $bike->description) }}" placeholder="Imię i nazwisko"
+               required style="padding:2px 4px; border:1px solid #aaa; min-width:120px; font-size:13px;">
+
+        <input type="tel" name="phone" value="{{ old('phone', $bike->phone) }}" placeholder="+48XXXXXXXXX"
+               pattern="^\+48\d{9}$" required
+               style="padding:2px 4px; border:1px solid #aaa; min-width:130px; font-size:13px;">
 
         <select name="status" required style="padding:2px 4px; border:1px solid #aaa; font-size:13px;">
             @foreach(['oczekuje', 'w naprawie', 'gotowy', 'odebrany'] as $status)
@@ -45,8 +49,9 @@
         </select>
 
         <input type="date" name="deadline" value="{{ old('deadline', $bike->deadline) }}" placeholder="Termin"
-               style="padding:2px 4px; border:1px solid #aaa; min-width:70px; font-size:13px;">
+               style="padding:2px 4px; border:1px solid #aaa; min-width:90px; font-size:13px;">
 
-        <input type="submit" value="Zapisz zmiany" style="padding:2px 8px; background:#1581e0; color:#fff; border:1px solid #1581e0; font-size:13px; cursor:pointer;">
+        <input type="submit" value="Zapisz zmiany"
+               style="padding:2px 8px; background:#1581e0; color:#fff; border:1px solid #1581e0; font-size:13px; cursor:pointer;">
     </form>
 @endsection

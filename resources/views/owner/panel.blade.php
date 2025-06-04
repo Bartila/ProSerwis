@@ -3,6 +3,12 @@
 @section('content')
     <h1 style="text-align:center; color:#0a4fa3; margin-bottom:20px; font-size:22px;">Panel właściciela</h1>
 
+    @if(session('success'))
+        <div style="color:#207227; background:#e9fbe5; border-radius:5px; padding:5px 12px; margin-bottom:20px; text-align:center;">
+            {{ session('success') }}
+        </div>
+    @endif
+
     {{-- Tabela statystyk --}}
     <div style="overflow-x:auto; margin-bottom:30px;">
         <table style="margin:0 auto; border-collapse:collapse; width:auto; min-width:400px; font-size:14px;">
@@ -28,7 +34,21 @@
             </tr>
             <tr>
                 <td style="padding:6px 10px; border:1px solid #d0d0d0;">Odebrane</td>
-                <td style="padding:6px 10px; border:1px solid #d0d0d0;">{{ $stats['odebrany'] }}</td>
+                <td style="padding:6px 10px; border:1px solid #d0d0d0;">
+                    {{ $stats['odebrany'] }}
+                    @if($stats['odebrany'] > 0)
+                        <form method="POST" action="{{ route('cyclesynchub.destroyCollected') }}"
+                              onsubmit="return confirm('Czy na pewno chcesz usunąć wszystkie rowery oznaczone jako odebrane?')"
+                              style="display:inline; margin-left:8px;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                    style="padding:2px 6px; background:#b32a2a; color:#fff; border:none; border-radius:4px; font-size:12px; cursor:pointer;">
+                                Usuń odebrane
+                            </button>
+                        </form>
+                    @endif
+                </td>
             </tr>
         </table>
     </div>
