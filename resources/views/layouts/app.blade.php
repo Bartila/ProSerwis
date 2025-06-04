@@ -62,12 +62,17 @@
         <a href="{{ route('home.index') }}">Strona główna</a>
         <a href="{{ route('cyclesynchub.index') }}">Rowery</a>
 
-        @if(auth()->user()?->role === 'owner')
+        @if(auth()->user()->role === 'owner')
             <a href="{{ route('owner.panel') }}">Panel właściciela</a>
         @endif
 
         @if(auth()->user()->isAdmin() || auth()->user()->isOwner())
             <a href="{{ route('users.index') }}">Użytkownicy</a>
+        @endif
+
+        {{-- Link do logów systemowych (tylko admin) --}}
+        @if(auth()->user()->isAdmin())
+            <a href="{{ route('activity_logs.index') }}">Logi systemowe</a>
         @endif
 
         <form method="POST" action="{{ route('logout') }}">

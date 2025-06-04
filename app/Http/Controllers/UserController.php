@@ -11,27 +11,28 @@ class UserController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth', 'role:admin,owner']);
+        // Każdy admin i owner może zobaczyć listę użytkowników
+        $this->middleware(['auth', 'role:admin,owner'])->only('index');
+        // Pozostałe akcje tylko dla admina
+        $this->middleware(['auth', 'role:admin'])->except('index');
     }
 
+    // Widok listy użytkowników (admin i owner)
     public function index()
     {
         $users = User::all();
         return view('users.index', compact('users'));
     }
 
+    // Tworzenie nowego użytkownika (tylko admin)
     public function create()
     {
         return view('users.create');
     }
 
+    // Zapis nowego użytkownika (tylko admin)
     public function store(Request $request)
     {
-        // Owner nie może tworzyć admina
-        if (auth()->user()->role === 'owner' && $request->role === 'admin') {
-            return redirect()->route('users.index')->with('error', 'Owner nie może tworzyć użytkownika z rolą admin.');
-        }
-
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users',
@@ -49,23 +50,15 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'Użytkownik dodany!');
     }
 
+    // Edycja użytkownika (tylko admin)
     public function edit(User $user)
     {
-        // Owner nie może edytować admina
-        if (auth()->user()->role === 'owner' && $user->role === 'admin') {
-            return redirect()->route('users.index')->with('error', 'Owner nie może edytować administratora!');
-        }
-
         return view('users.edit', compact('user'));
     }
 
+    // Zapis edycji użytkownika (tylko admin)
     public function update(Request $request, User $user)
     {
-        // Owner nie może aktualizować admina
-        if (auth()->user()->role === 'owner' && $user->role === 'admin') {
-            return redirect()->route('users.index')->with('error', 'Brak uprawnień do edycji tego użytkownika!');
-        }
-
         $request->validate([
             'name'     => 'required|string|max:255',
             'password' => 'nullable|string|min:6|confirmed',
@@ -82,6 +75,7 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'Użytkownik zaktualizowany!');
     }
 
+    // Usuwanie użytkownika (tylko admin)
     public function destroy($id)
     {
         $user = User::findOrFail($id);
@@ -91,12 +85,6 @@ class UserController extends Controller
             return redirect()->route('users.index')->with('error', 'Nie możesz usunąć samego siebie!');
         }
 
-        // Owner nie może usuwać adminów ani innych ownerów
-        if ($authUser->role === 'owner' && in_array($user->role, ['admin', 'owner'])) {
-            return redirect()->route('users.index')->with('error', 'Owner nie może usuwać tego użytkownika!');
-        }
-
-        // Admin może usuwać każdego
         $user->delete();
 
         return redirect()->route('users.index')->with('success', 'Użytkownik usunięty!');
