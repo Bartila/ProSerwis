@@ -18,14 +18,10 @@ class CycleSyncHubController extends Controller
             $bikesQuery->where('name', 'like', "%{$q}%");
         }
 
-        $bikes = $bikesQuery->with('user')->get();
+        // Sortuj po dacie przyjęcia (deadline), rosnąco
+        $bikes = $bikesQuery->with('user')->orderBy('deadline', 'asc')->get();
 
         return view('bikes.index', compact('bikes', 'q'));
-    }
-
-    public function create()
-    {
-        return view('bikes.create');
     }
 
     public function store(Request $request)
@@ -53,7 +49,6 @@ class CycleSyncHubController extends Controller
             'deadline'    => $request->deadline,
         ]);
 
-        // Logowanie operacji
         log_activity('add', 'Bike', $bike->id, 'Dodano rower: ' . $bike->name);
 
         return redirect()->route('cyclesynchub.index')->with('success', 'Rower dodany!');
@@ -97,7 +92,6 @@ class CycleSyncHubController extends Controller
             'deadline'    => $request->deadline,
         ]);
 
-        // Logowanie operacji
         log_activity('edit', 'Bike', $bike->id, 'Edytowano rower: ' . $bike->name);
 
         return redirect()->route('cyclesynchub.index')->with('success', 'Rower zaktualizowany!');
@@ -108,7 +102,6 @@ class CycleSyncHubController extends Controller
         $bike = Bike::findOrFail($id);
         $bike->update(['status' => 'gotowy']);
 
-        // Logowanie operacji
         log_activity('status_change', 'Bike', $id, 'Oznaczono rower jako gotowy');
 
         return redirect()->route('cyclesynchub.index')->with('success', 'Rower oznaczony jako gotowy!');
@@ -119,7 +112,6 @@ class CycleSyncHubController extends Controller
         $bike = Bike::findOrFail($id);
         $bike->update(['status' => 'odebrany']);
 
-        // Logowanie operacji
         log_activity('status_change', 'Bike', $id, 'Oznaczono rower jako odebrany');
 
         return redirect()->route('cyclesynchub.index')->with('success', 'Rower oznaczony jako odebrany!');
@@ -136,13 +128,11 @@ class CycleSyncHubController extends Controller
 
         $bike->delete();
 
-        // Logowanie operacji
         log_activity('delete', 'Bike', $id, 'Usunięto rower: ' . $bike->name);
 
         return redirect()->route('cyclesynchub.index')->with('success', 'Rower usunięty!');
     }
 
-    //  Usuwanie wszystkich odebranych rowerów
     public function destroyCollected()
     {
         $user = Auth::user();
@@ -153,7 +143,6 @@ class CycleSyncHubController extends Controller
 
         $deleted = Bike::where('status', 'odebrany')->delete();
 
-        // Logowanie operacji
         log_activity('delete_many', 'Bike', null, "Usunięto $deleted rower(ów) o statusie 'odebrany'");
 
         return redirect()->route('owner.panel')->with('success', "$deleted rower(ów) odebranych usunięto.");

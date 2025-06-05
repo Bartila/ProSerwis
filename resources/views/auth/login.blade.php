@@ -67,14 +67,24 @@
         background-color: #fff;
     }
 
+    /* OLD SCHOOL BUTTON STYLE */
     .login-right button {
         margin-top: 20px;
-        background: #d83030;
-        color: white;
-        padding: 10px 30px;
-        border: 1px solid #900;
+        padding: 8px 32px;
+        background: #eaeaea;
+        color: #222;
+        border: 2px outset #b3b3b3;
+        border-radius: 0;
         font-size: 14px;
         cursor: pointer;
+        font-family: inherit;
+        min-width: 80px;
+        transition: none;
+        box-shadow: none;
+    }
+    .login-right button:active {
+        border-style: inset;
+        background: #dfdfdf;
     }
 
     .login-right .note {

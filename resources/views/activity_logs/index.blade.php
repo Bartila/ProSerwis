@@ -14,11 +14,12 @@
     @if(auth()->user()->isAdmin() || auth()->user()->isOwner())
         <form method="POST" action="{{ route('activity_logs.destroyAll') }}"
               onsubmit="return confirm('Na pewno wyczyścić WSZYSTKIE logi?');"
-              style="text-align:right; margin-bottom:20px;">
+              style="text-align:center; margin-bottom:20px;">
             @csrf
             @method('DELETE')
+            {{-- OLD SCHOOL BUTTON --}}
             <button type="submit"
-                style="background:none; border:none; text-decoration:underline; font-size:15px; cursor:pointer; padding:0;">
+                style="padding:5px 22px; background:#eaeaea; color:#222; border:2px outset #b3b3b3; border-radius:0; font-size:15px; cursor:pointer; font-family:inherit; min-width:80px;">
                 Wyczyść
             </button>
         </form>

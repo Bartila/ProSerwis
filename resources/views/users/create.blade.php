@@ -54,7 +54,7 @@
 
         <div style="text-align:center;">
             <input type="submit" value="Dodaj użytkownika"
-                   style="padding:6px 14px; background:#1581e0; color:#fff; border:none; border-radius:4px; cursor:pointer;">
+                   style="padding:6px 18px; background:#eaeaea; color:#222; border:2px outset #b3b3b3; border-radius:0; font-size:15px; cursor:pointer; font-family:inherit; min-width:130px;">
         </div>
     </form>
 @endsection

@@ -42,10 +42,12 @@
                               style="display:inline; margin-left:8px;">
                             @csrf
                             @method('DELETE')
+                            {{-- OLD SCHOOL BUTTON START --}}
                             <button type="submit"
-                                    style="padding:2px 6px; background:#b32a2a; color:#fff; border:none; border-radius:4px; font-size:12px; cursor:pointer;">
+                                    style="padding:2px 10px; background:#eaeaea; color:#222; border:2px outset #b3b3b3; font-size:12px; cursor:pointer; border-radius:0; font-family:inherit;">
                                 Usuń odebrane
                             </button>
+                            {{-- OLD SCHOOL BUTTON END --}}
                         </form>
                     @endif
                 </td>

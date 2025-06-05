@@ -18,7 +18,9 @@
     {{-- Tylko admin widzi przycisk dodawania --}}
     @if(auth()->user()->role === 'admin')
         <div style="margin-bottom:14px; text-align:center;">
-            <a href="{{ route('users.create') }}" style="color:#1581e0; text-decoration:underline; font-weight:500;">
+            {{-- OLD SCHOOL BUTTON "Dodaj nowego użytkownika" --}}
+            <a href="{{ route('users.create') }}"
+               style="display:inline-block; padding:6px 20px; background:#eaeaea; color:#222; border:2px outset #b3b3b3; border-radius:0; font-size:15px; cursor:pointer; font-family:inherit; min-width:170px; text-align:center; text-decoration:none;">
                 Dodaj nowego użytkownika
             </a>
         </div>
