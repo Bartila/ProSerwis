@@ -7,10 +7,11 @@ use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
+    // idź po zalogowaniu
     public const HOME = '/';
 
     /**
-     * Define your route model bindings, pattern filters, etc.
+     * Metoda wywoływana automatycznie przy starcie aplikacji.
      */
     public function boot(): void
     {

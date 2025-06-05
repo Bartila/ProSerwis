@@ -19,7 +19,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role', // DODAJEMY pole roli
+        'role', 
     ];
 
     /**
@@ -45,13 +45,11 @@ class User extends Authenticatable
         ];
     }
 
-    // Dodajemy relację z rowerami
     public function bikes()
     {
         return $this->hasMany(Bike::class);
     }
 
-    // Możesz dodać pomocnicze metody do sprawdzania roli:
     public function isAdmin()
     {
         return $this->role === 'admin';

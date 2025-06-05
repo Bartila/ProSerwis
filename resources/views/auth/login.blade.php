@@ -26,7 +26,6 @@
 
     .login-left {
         width: 40%;
-        background-image: url('/images/subiekt-left.png'); /* opcjonalnie dodaj obrazek tła */
         background-size: cover;
         background-position: center;
         border-right: 1px solid #ccc;
@@ -67,7 +66,6 @@
         background-color: #fff;
     }
 
-    /* OLD SCHOOL BUTTON STYLE */
     .login-right button {
         margin-top: 20px;
         padding: 8px 32px;
@@ -99,7 +97,6 @@
     <div class="login-container">
         <div class="login-left">
             <h1>CycleSyncHub</h1>
-            {{-- opcjonalnie logo lub obrazek --}}
         </div>
         <div class="login-right">
             <h2>Logowanie</h2>

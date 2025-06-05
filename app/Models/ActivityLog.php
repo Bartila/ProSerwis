@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+/**
+ * Model reprezentujący pojedynczy wpis logu aktywności w systemie.
+ */
 
 class ActivityLog extends Model
 {

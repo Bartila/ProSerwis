@@ -5,16 +5,11 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+    /**
+     * Sprawdza, czy zalogowany użytkownik posiada wymaganą rolę.
+     */
 class RoleMiddleware
 {
-    /**
-     * Obsługuje role użytkownika.
-     *
-     * Przykład użycia w trasie:
-     *  ->middleware('role:admin')
-     *  ->middleware('role:admin,owner')
-     */
     public function handle(Request $request, Closure $next, ...$roles)
     {
         $user = Auth::user();

@@ -15,10 +15,8 @@
         </div>
     @endif
 
-    {{-- Tylko admin widzi przycisk dodawania --}}
     @if(auth()->user()->role === 'admin')
         <div style="margin-bottom:14px; text-align:center;">
-            {{-- OLD SCHOOL BUTTON "Dodaj nowego użytkownika" --}}
             <a href="{{ route('users.create') }}"
                style="display:inline-block; padding:6px 20px; background:#eaeaea; color:#222; border:2px outset #b3b3b3; border-radius:0; font-size:15px; cursor:pointer; font-family:inherit; min-width:170px; text-align:center; text-decoration:none;">
                 Dodaj nowego użytkownika
@@ -33,7 +31,6 @@
                 <th style="padding:5px 8px; border:1px solid #bdbdbd;">Nazwa</th>
                 <th style="padding:5px 8px; border:1px solid #bdbdbd;">Email</th>
                 <th style="padding:5px 8px; border:1px solid #bdbdbd;">Rola</th>
-                {{-- Tylko admin widzi akcje --}}
                 @if(auth()->user()->role === 'admin')
                     <th style="padding:5px 8px; border:1px solid #bdbdbd;">Akcje</th>
                 @endif
@@ -44,7 +41,6 @@
                     <td style="padding:4px 6px; border:1px solid #d0d0d0;">{{ $user->name }}</td>
                     <td style="padding:4px 6px; border:1px solid #d0d0d0;">{{ $user->email }}</td>
                     <td style="padding:4px 6px; border:1px solid #d0d0d0;">{{ ucfirst($user->role) }}</td>
-                    {{-- Akcje tylko dla admina --}}
                     @if(auth()->user()->role === 'admin')
                         <td style="padding:4px 6px; border:1px solid #d0d0d0;">
                             <a href="{{ route('users.edit', $user->id) }}" style="color:#1581e0; text-decoration:underline; margin-right:6px;">Edytuj</a>

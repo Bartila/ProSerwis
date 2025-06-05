@@ -7,30 +7,33 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Routing\Controller;
 
+/**
+ * Kontroler do zarządzania użytkownikami systemu (admin/owner).
+ */
 class UserController extends Controller
 {
     public function __construct()
     {
-        // Każdy admin i owner może zobaczyć listę użytkowników
         $this->middleware(['auth', 'role:admin,owner'])->only('index');
-        // Pozostałe akcje tylko dla admina
         $this->middleware(['auth', 'role:admin'])->except('index');
     }
 
-    // Widok listy użytkowników (admin i owner)
+
     public function index()
     {
         $users = User::all();
+
         return view('users.index', compact('users'));
     }
 
-    // Tworzenie nowego użytkownika (tylko admin)
     public function create()
     {
         return view('users.create');
     }
 
-    // Zapis nowego użytkownika (tylko admin)
+    /**
+     * Zapisuje nowego użytkownika do bazy (tylko admin).
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -50,13 +53,17 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'Użytkownik dodany!');
     }
 
-    // Edycja użytkownika (tylko admin)
+    /**
+     * Formularz edycji wybranego użytkownika (tylko admin).
+     */
     public function edit(User $user)
     {
         return view('users.edit', compact('user'));
     }
 
-    // Zapis edycji użytkownika (tylko admin)
+    /**
+     * Zapisuje zmiany w danych użytkownika (tylko admin).
+     */
     public function update(Request $request, User $user)
     {
         $request->validate([
@@ -75,7 +82,10 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'Użytkownik zaktualizowany!');
     }
 
-    // Usuwanie użytkownika (tylko admin)
+    /**
+     * Usuwa wybranego użytkownika z bazy (tylko admin).
+     * Admin nie może usunąć samego siebie
+     */
     public function destroy($id)
     {
         $user = User::findOrFail($id);

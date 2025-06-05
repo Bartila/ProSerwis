@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Bike;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Kontroler panelu właściciela (owner).
+ */
 class OwnerPanelController extends Controller
 {
     public function index()
@@ -23,10 +26,11 @@ class OwnerPanelController extends Controller
             'odebrany'  => $bikes->where('status', 'odebrany')->count(),
         ];
 
+        // rowery deadline
         $overdueBikes = $bikes->filter(function ($bike) {
             return $bike->deadline && $bike->deadline < now() && $bike->status !== 'gotowy';
         });
-
+        
         return view('owner.panel', compact('stats', 'overdueBikes'));
     }
 }

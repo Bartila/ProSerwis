@@ -42,12 +42,10 @@
                               style="display:inline; margin-left:8px;">
                             @csrf
                             @method('DELETE')
-                            {{-- OLD SCHOOL BUTTON START --}}
                             <button type="submit"
                                     style="padding:2px 10px; background:#eaeaea; color:#222; border:2px outset #b3b3b3; font-size:12px; cursor:pointer; border-radius:0; font-family:inherit;">
                                 Usuń odebrane
                             </button>
-                            {{-- OLD SCHOOL BUTTON END --}}
                         </form>
                     @endif
                 </td>
@@ -55,7 +53,7 @@
         </table>
     </div>
 
-    {{-- Tabela rowerów po terminie --}}
+    {{-- Rowery po terminie --}}
     @if(isset($overdueBikes) && $overdueBikes->count())
         <h2 style="text-align:center; color:#b32a2a; margin-bottom:15px; font-size:20px;">Rowery po terminie</h2>
 

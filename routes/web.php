@@ -7,17 +7,16 @@ use App\Http\Controllers\OwnerPanelController;
 use App\Http\Controllers\ActivityLogController;
 use Illuminate\Support\Facades\Route;
 
-// Strona startowa
 Route::get('/', function () {
     return view('index');
 })->name('home.index');
 
-// Lista użytkowników (tylko dla admina i ownera – index)
+// Lista użytkowników – widoczna tylko dla admina i ownera
 Route::middleware(['auth'])->group(function () {
     Route::get('users', [UserController::class, 'index'])->name('users.index');
 });
 
-// Zarządzanie użytkownikami (tylko admin)
+// Zarządzanie użytkownikami (CRUD) – tylko dla admina
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('users/create', [UserController::class, 'create'])->name('users.create');
     Route::post('users', [UserController::class, 'store'])->name('users.store');
@@ -26,18 +25,18 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 });
 
-// Panel właściciela
+// Panel właściciela - owner
 Route::middleware(['auth', 'role:owner'])->group(function () {
     Route::get('/owner-panel', [OwnerPanelController::class, 'index'])->name('owner.panel');
 });
 
-// Logi (tylko admin)
+// Logi aktywności (tylko admin)
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/logi', [ActivityLogController::class, 'index'])->name('activity_logs.index');
     Route::delete('/logi/wyczysc', [ActivityLogController::class, 'destroyAll'])->name('activity_logs.destroyAll');
 });
 
-// Grupa tras do rowerów (CRUD), tylko dla zalogowanych
+// trasy do zarządzania rowerami – tylko dla zalogowanych
 Route::middleware(['auth'])
     ->prefix('cyclesynchub')
     ->name('cyclesynchub.')
@@ -52,16 +51,13 @@ Route::middleware(['auth'])
         Route::put('/collected/{bike}', 'markAsCollected')->name('collected');
         Route::put('/complete/{bike}', 'complete')->name('complete');
         Route::get('/owner-panel', [CycleSyncHubController::class, 'ownerPanel'])->name('owner.panel')->middleware('role:owner');
-        // Usuwanie wszystkich rowerów odebranych (tylko dla ownera)
         Route::delete('/collected/delete-all', 'destroyCollected')->name('destroyCollected')->middleware('role:owner');
     });
 
-// Dashboard (np. Breeze lub Jetstream)
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Profile (Breeze lub Jetstream)
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

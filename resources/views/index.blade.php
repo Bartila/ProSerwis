@@ -6,7 +6,7 @@
 @section('content')
     <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:300px;">
         <h1 style="color:#0a4fa3; font-size:2.5rem; margin-bottom:18px; text-align:center;">
-            Witaj w <span style="font-weight:bold;">CycleSyncHub</span>!
+            <span style="font-weight:bold;">CycleSyncHub</span>
         </h1>
         <p style="font-size:1.1rem; color:#333; max-width:480px; text-align:center; margin-bottom:28px;">
             Twoja platforma do zarządzania serwisem rowerów

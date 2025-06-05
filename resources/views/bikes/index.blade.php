@@ -38,6 +38,10 @@
             <option value="Microshift">Microshift</option>
             <option value="Inne">Inne</option>
         </select>
+
+        <textarea name="info" placeholder="Opisz, co trzeba naprawić"
+            style="padding:2px 4px; border:1px solid #aaa; min-width:160px; font-size:13px; min-height:32px;">{{ old('info') }}</textarea>
+
         <input type="number" step="0.1" name="weight" placeholder="Waga (kg)" style="padding:2px 4px; border:1px solid #aaa; min-width:70px; font-size:13px;">
         <input type="text" name="description" placeholder="Imię i nazwisko" required style="padding:2px 4px; border:1px solid #aaa; min-width:100px; font-size:13px;">
         <input type="tel" name="phone" placeholder="+48XXXXXXXXX" pattern="^\+48\d{9}$" required style="padding:2px 4px; border:1px solid #aaa; min-width:120px; font-size:13px;">
@@ -46,24 +50,20 @@
             <option value="w naprawie">W naprawie</option>
         </select>
         <input type="date" name="deadline" placeholder="Termin" style="padding:2px 4px; border:1px solid #aaa; min-width:70px; font-size:13px;">
-        {{-- OLD SCHOOL BUTTON START --}}
         <input
             type="submit"
             value="Dodaj"
             style="padding:2px 8px; background:#eaeaea; color:#222; border:2px outset #b3b3b3; font-size:13px; cursor:pointer; border-radius:0; font-family:inherit;">
-        {{-- OLD SCHOOL BUTTON END --}}
     </form>
 
     {{-- Wyszukiwarka --}}
     <form method="GET" action="{{ route('cyclesynchub.index') }}" style="margin-bottom:6px; text-align:center;">
         <input type="text" name="q" placeholder="Szukaj po nazwie..." value="{{ request('q') }}" style="padding:2px 6px; border:1px solid #aaa; width:120px; font-size:13px;">
-        {{-- OLD SCHOOL BUTTON START --}}
         <button
             type="submit"
             style="padding:2px 10px; background:#eaeaea; color:#222; border:2px outset #b3b3b3; font-size:13px; cursor:pointer; border-radius:0; font-family:inherit;">
             Szukaj
         </button>
-        {{-- OLD SCHOOL BUTTON END --}}
     </form>
 
     {{-- Lista rowerów --}}

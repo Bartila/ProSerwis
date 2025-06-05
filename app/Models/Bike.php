@@ -6,20 +6,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class Bike extends Model
 {
-    // Pola, które można masowo przypisywać (mass assignment)
     protected $fillable = [
     'name',
     'type',
     'user_id',
     'phone',
     'components',
+    'info',
     'weight',
     'description',
     'status',
     'deadline',
     ];
 
-    // Relacja: jeden rower należy do jednego użytkownika
+    // jeden rower należy do jednego użytkownika
     public function user()
     {
         return $this->belongsTo(User::class);

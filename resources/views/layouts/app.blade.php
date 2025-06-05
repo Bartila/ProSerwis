@@ -7,7 +7,6 @@
 
     <title>{{ config('app.name', 'CycleSyncHub') }}</title>
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -70,9 +69,8 @@
             <a href="{{ route('users.index') }}">Użytkownicy</a>
         @endif
 
-        {{-- Link do logów systemowych (tylko admin) --}}
         @if(auth()->user()->isAdmin())
-            <a href="{{ route('activity_logs.index') }}">Logi systemowe</a>
+            <a href="{{ route('activity_logs.index') }}">Historia operacji</a>
         @endif
 
         <form method="POST" action="{{ route('logout') }}">

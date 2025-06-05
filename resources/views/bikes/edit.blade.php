@@ -32,6 +32,9 @@
             @endforeach
         </select>
 
+        <textarea name="info" placeholder="Opisz, co trzeba naprawić"
+            style="padding:2px 4px; border:1px solid #aaa; min-width:160px; font-size:13px; min-height:32px;">{{ old('info', $bike->info) }}</textarea>
+
         <input type="number" step="0.1" name="weight" value="{{ old('weight', $bike->weight) }}" placeholder="Waga (kg)"
                style="padding:2px 4px; border:1px solid #aaa; min-width:70px; font-size:13px;">
 
@@ -51,7 +54,7 @@
         <input type="date" name="deadline" value="{{ old('deadline', $bike->deadline) }}" placeholder="Termin"
                style="padding:2px 4px; border:1px solid #aaa; min-width:90px; font-size:13px;">
 
-        {{-- OLD SCHOOL BUTTON --}}
+
         <input type="submit" value="Zapisz zmiany"
                style="padding:2px 10px; background:#eaeaea; color:#222; border:2px outset #b3b3b3; border-radius:0; font-size:13px; cursor:pointer; font-family:inherit; min-width:90px;">
     </form>
