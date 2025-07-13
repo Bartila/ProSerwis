@@ -54,6 +54,11 @@
         <input type="date" name="deadline" value="{{ old('deadline', $bike->deadline) }}" placeholder="Termin"
                style="padding:2px 4px; border:1px solid #aaa; min-width:90px; font-size:13px;">
 
+        {{-- Kod QR dostępny dla KAŻDEGO zalogowanego --}}
+        @auth
+            <input type="text" name="qr_code" value="{{ old('qr_code', $bike->qr_code) }}" placeholder="Kod QR (skan lub wpisz)"
+                   style="padding:2px 4px; border:1px solid #aaa; min-width:140px; font-size:13px;">
+        @endauth
 
         <input type="submit" value="Zapisz zmiany"
                style="padding:2px 10px; background:#eaeaea; color:#222; border:2px outset #b3b3b3; border-radius:0; font-size:13px; cursor:pointer; font-family:inherit; min-width:90px;">

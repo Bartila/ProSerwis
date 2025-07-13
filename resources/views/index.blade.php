@@ -27,7 +27,6 @@
                     Logowanie
                 </a>
                 <a href="{{ route('register') }}" style="color:#1581e0; text-decoration:underline; font-weight:500;">
-
                 </a>
             @endauth
         </nav>

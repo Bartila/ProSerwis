@@ -17,6 +17,7 @@ class Bike extends Model
     'description',
     'status',
     'deadline',
+    'qr_code',
     ];
 
     // jeden rower należy do jednego użytkownika

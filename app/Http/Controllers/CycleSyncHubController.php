@@ -6,14 +6,8 @@ use App\Models\Bike;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-/**
- * Kontroler obsługujący zarządzanie rowerami w CycleSyncHub.
- */
 class CycleSyncHubController extends Controller
 {
-    /**
-     * Wyświetla listę rowerów, z opcją filtrowania po nazwie i sortowaniem po dacie przyjęcia.
-     */
     public function index(Request $request)
     {
         $q = $request->input('q');
@@ -29,12 +23,8 @@ class CycleSyncHubController extends Controller
         return view('bikes.index', compact('bikes', 'q'));
     }
 
-    /**
-     * Obsługuje dodawanie nowego roweru.
-     */
     public function store(Request $request)
     {
-        // Walidacja danych z formularza
         $request->validate([
             'name'        => 'required|string|max:255',
             'type'        => 'required|string|max:255',
@@ -45,9 +35,9 @@ class CycleSyncHubController extends Controller
             'phone'       => ['required', 'regex:/^\+48\d{9}$/'],
             'status'      => 'required|string|max:30',
             'deadline'    => 'nullable|date',
+            'qr_code'     => 'nullable|string|unique:bikes,qr_code',
         ]);
 
-        // Tworzenie nowego rekordu Bike w bazie
         $bike = Bike::create([
             'name'        => $request->name,
             'type'        => $request->type,
@@ -59,35 +49,26 @@ class CycleSyncHubController extends Controller
             'phone'       => $request->phone,
             'status'      => $request->status,
             'deadline'    => $request->deadline,
+            'qr_code'     => $request->input('qr_code'),
         ]);
 
-        // Zapis aktywności w logach (funkcja pomocnicza)
         log_activity('add', 'Bike', $bike->id, 'Dodano rower: ' . $bike->name);
 
         return redirect()->route('cyclesynchub.index')->with('success', 'Rower dodany!');
     }
 
-    /**
-     * Wyświetla szczegóły wybranego roweru.
-     */
     public function show($id)
     {
         $bike = Bike::findOrFail($id);
         return view('bikes.show', compact('bike'));
     }
 
-    /**
-     * Wyświetla formularz edycji roweru.
-     */
     public function edit($id)
     {
         $bike = Bike::findOrFail($id);
         return view('bikes.edit', compact('bike'));
     }
 
-    /**
-     * Aktualizuje dane wybranego roweru.
-     */
     public function update(Request $request, $id)
     {
         $bike = Bike::findOrFail($id);
@@ -102,9 +83,9 @@ class CycleSyncHubController extends Controller
             'phone'       => ['required', 'regex:/^\+48\d{9}$/'],
             'status'      => 'required|string|max:30',
             'deadline'    => 'nullable|date',
+            'qr_code'     => 'nullable|string|unique:bikes,qr_code,' . $bike->id,
         ]);
 
-        // Aktualizacja danych roweru
         $bike->update([
             'name'        => $request->name,
             'type'        => $request->type,
@@ -115,17 +96,14 @@ class CycleSyncHubController extends Controller
             'phone'       => $request->phone,
             'status'      => $request->status,
             'deadline'    => $request->deadline,
+            'qr_code'     => $request->input('qr_code'),
         ]);
 
-        // Zapis aktywności w logach
         log_activity('edit', 'Bike', $bike->id, 'Edytowano rower: ' . $bike->name);
 
         return redirect()->route('cyclesynchub.index')->with('success', 'Rower zaktualizowany!');
     }
 
-    /**
-     * Oznacza rower jako gotowy do odbioru (zmiana statusu).
-     */
     public function complete($id)
     {
         $bike = Bike::findOrFail($id);
@@ -136,9 +114,6 @@ class CycleSyncHubController extends Controller
         return redirect()->route('cyclesynchub.index')->with('success', 'Rower oznaczony jako gotowy!');
     }
 
-    /**
-     * Oznacza rower jako odebrany przez właściciela (zmiana statusu).
-     */
     public function markAsCollected($id)
     {
         $bike = Bike::findOrFail($id);
@@ -149,15 +124,12 @@ class CycleSyncHubController extends Controller
         return redirect()->route('cyclesynchub.index')->with('success', 'Rower oznaczony jako odebrany!');
     }
 
-    /**
-     * Usuwa wybrany rower z bazy, tylko dla admina lub ownera.
-     */
     public function destroy($id)
     {
         $bike = Bike::findOrFail($id);
 
         $user = Auth::user();
-        if ($user->role !== 'admin' && $user->role !== 'owner') {
+        if (!in_array($user->role, ['admin', 'owner'])) {
             abort(403, 'Brak dostępu do usuwania roweru');
         }
 
@@ -168,10 +140,6 @@ class CycleSyncHubController extends Controller
         return redirect()->route('cyclesynchub.index')->with('success', 'Rower usunięty!');
     }
 
-    /**
-     * Usuwa wszystkie rowery o statusie 'odebrany'.
-     * Tylko właściciel (owner) ma do tego dostęp.
-     */
     public function destroyCollected()
     {
         $user = Auth::user();
@@ -185,5 +153,16 @@ class CycleSyncHubController extends Controller
         log_activity('delete_many', 'Bike', null, "Usunięto $deleted rower(ów) o statusie 'odebrany'");
 
         return redirect()->route('owner.panel')->with('success', "$deleted rower(ów) odebranych usunięto.");
+    }
+
+    /**
+     * Obsługuje wyszukiwanie roweru po kodzie QR.
+     */
+    public function findByQr(Request $request)
+    {
+        $code = $request->input('code');
+        $bike = Bike::where('qr_code', $code)->firstOrFail();
+
+        return redirect()->route('cyclesynchub.show', $bike->id);
     }
 }

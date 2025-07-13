@@ -36,7 +36,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::delete('/logi/wyczysc', [ActivityLogController::class, 'destroyAll'])->name('activity_logs.destroyAll');
 });
 
-// trasy do zarządzania rowerami – tylko dla zalogowanych
+// Trasy do zarządzania rowerami – tylko dla zalogowanych
 Route::middleware(['auth'])
     ->prefix('cyclesynchub')
     ->name('cyclesynchub.')
@@ -54,10 +54,20 @@ Route::middleware(['auth'])
         Route::delete('/collected/delete-all', 'destroyCollected')->name('destroyCollected')->middleware('role:owner');
     });
 
+// 🔍 Formularz do wyszukania roweru po QR (GET: pokaż formularz)
+Route::middleware(['auth'])->get('/qr-szukaj', function () {
+    return view('bikes.qr-search');
+})->name('qr.search');
+
+// 🔍 Wyszukiwanie roweru po kodzie QR (POST: wykonaj przekierowanie)
+Route::middleware(['auth'])->post('/qr-szukaj', [CycleSyncHubController::class, 'findByQr'])->name('qr.lookup');
+
+// Po zalogowaniu
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+// Profil użytkownika
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
