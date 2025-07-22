@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="description" content="CycleSyncHub – zarządzanie naprawami rowerów">
 
     <title>{{ config('app.name', 'CycleSyncHub') }}</title>
 
@@ -18,14 +19,22 @@
             font-family: sans-serif;
             background: #f5f5f5;
             display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
+
         aside {
             width: 220px;
             background: #e0e0e0;
             height: 100vh;
             padding: 20px;
             box-shadow: 2px 0 8px #ccc;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
         }
+
         aside a, aside form button {
             display: block;
             padding: 8px 12px;
@@ -34,19 +43,57 @@
             text-decoration: none;
             border-radius: 4px;
         }
+
         aside a:hover, aside form button:hover {
             background: #d0d0d0;
         }
+
         main {
-            flex: 1;
+            margin-left: 220px;
             padding: 40px;
             background: #fff;
-            min-height: 100vh;
+            flex: 1;
+            position: relative;
         }
+
         .user-info {
             font-size: 0.9rem;
             margin-bottom: 20px;
             color: #444;
+        }
+
+        footer {
+            background: #eee;
+            text-align: center;
+            padding: 10px;
+            font-size: 13px;
+            color: #444;
+            margin-top: auto;
+        }
+
+        .bike-counter-wrapper {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #222;
+        }
+
+        .red-dot-button {
+            width: 12px;
+            height: 12px;
+            background-color: red;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .red-dot-button:hover {
+            opacity: 0.8;
         }
     </style>
 </head>
@@ -81,8 +128,28 @@
 @endauth
 
 <main>
+    {{-- 🚲 Licznik i 🔴 przycisk resetu --}}
+    @isset($totalAdded)
+        <div class="bike-counter-wrapper">
+            🚲 {{ $totalAdded }}
+
+            @if(auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isOwner()))
+                <form method="POST" action="{{ route('messages.resetCounter') }}"
+                      onsubmit="return confirm('Na pewno zresetować licznik rowerów?')"
+                      style="display:inline;">
+                    @csrf
+                    <button type="submit" class="red-dot-button" title="Zresetuj licznik"></button>
+                </form>
+            @endif
+        </div>
+    @endisset
+
     @yield('content')
 </main>
+
+<footer>
+    &copy; {{ date('Y') }} ProSerwis
+</footer>
 
 </body>
 </html>

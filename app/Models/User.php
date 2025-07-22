@@ -19,7 +19,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role', 
+        'role',
     ];
 
     /**
@@ -49,6 +49,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Bike::class);
     }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+
 
     public function isAdmin()
     {

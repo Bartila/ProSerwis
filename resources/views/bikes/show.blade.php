@@ -12,19 +12,11 @@
                 <td style="padding:6px 10px; border:1px solid #ccc;">{{ ucfirst($bike->type) }}</td>
             </tr>
             <tr>
-                <th style="text-align:left; padding:6px 10px; border:1px solid #ccc;">Podzespoły</th>
-                <td style="padding:6px 10px; border:1px solid #ccc;">{{ $bike->components ?? '-' }}</td>
-            </tr>
-            <tr>
                 <th style="text-align:left; padding:6px 10px; border:1px solid #ccc;">Opis naprawy</th>
                 <td style="padding:6px 10px; border:1px solid #ccc;">{{ $bike->info ?? '-' }}</td>
             </tr>
             <tr>
-                <th style="text-align:left; padding:6px 10px; border:1px solid #ccc;">Waga</th>
-                <td style="padding:6px 10px; border:1px solid #ccc;">{{ $bike->weight ? $bike->weight.' kg' : '-' }}</td>
-            </tr>
-            <tr>
-                <th style="text-align:left; padding:6px 10px; border:1px solid #ccc;">Opis / Imię</th>
+                <th style="text-align:left; padding:6px 10px; border:1px solid #ccc;">Imię i nazwisko</th>
                 <td style="padding:6px 10px; border:1px solid #ccc;">{{ $bike->description ?? '-' }}</td>
             </tr>
             <tr>

@@ -13,14 +13,14 @@ class ActivityLogController extends Controller
 
     public function index()
     {
-        $logs = ActivityLog::with('user')->orderBy('created_at', 'desc')->paginate(50);
+        $logs = ActivityLog::with('user')->orderBy('created_at', 'desc')->paginate(10);
         return view('activity_logs.index', compact('logs'));
     }
 
     public function destroyAll()
     {
-        // Ochrona: tylko admin lub owner
-        if (!auth()->user()->isAdmin() && !auth()->user()->isOwner()) {
+        // Ochrona: tylko admin
+        if (!auth()->user()->isAdmin()) {
             abort(403, 'Brak uprawnień do czyszczenia logów.');
         }
 

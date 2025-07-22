@@ -5,18 +5,24 @@ use App\Http\Controllers\CycleSyncHubController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\OwnerPanelController;
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('index');
-})->name('home.index');
+Route::get('/', [MessageController::class, 'index'])->middleware('auth')->name('home.index');
 
-// Lista użytkowników – widoczna tylko dla admina i ownera
+// 📩 Wiadomości
+Route::middleware(['auth'])->group(function () {
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+    Route::delete('/messages/{id}', [MessageController::class, 'destroy'])->name('messages.destroy');
+    Route::post('/reset-counter', [MessageController::class, 'resetCounter'])->name('messages.resetCounter')->middleware('role:admin,owner');
+});
+
+// 👥 Użytkownicy
 Route::middleware(['auth'])->group(function () {
     Route::get('users', [UserController::class, 'index'])->name('users.index');
 });
 
-// Zarządzanie użytkownikami (CRUD) – tylko dla admina
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('users/create', [UserController::class, 'create'])->name('users.create');
     Route::post('users', [UserController::class, 'store'])->name('users.store');
@@ -25,18 +31,18 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 });
 
-// Panel właściciela - owner
+// ⚙️ Panel właściciela
 Route::middleware(['auth', 'role:owner'])->group(function () {
     Route::get('/owner-panel', [OwnerPanelController::class, 'index'])->name('owner.panel');
 });
 
-// Logi aktywności (tylko admin)
+// 🧾 Logi
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/logi', [ActivityLogController::class, 'index'])->name('activity_logs.index');
     Route::delete('/logi/wyczysc', [ActivityLogController::class, 'destroyAll'])->name('activity_logs.destroyAll');
 });
 
-// Trasy do zarządzania rowerami – tylko dla zalogowanych
+// 🚲 Rowery
 Route::middleware(['auth'])
     ->prefix('cyclesynchub')
     ->name('cyclesynchub.')
@@ -44,30 +50,32 @@ Route::middleware(['auth'])
     ->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('/', 'store')->name('store');
-        Route::get('/{bike}/edit', 'edit')->name('edit');
-        Route::get('/{bike}', 'show')->name('show');
-        Route::put('/{bike}', 'update')->name('update');
-        Route::delete('/{bike}', 'destroy')->name('destroy');
-        Route::put('/collected/{bike}', 'markAsCollected')->name('collected');
-        Route::put('/complete/{bike}', 'complete')->name('complete');
-        Route::get('/owner-panel', [CycleSyncHubController::class, 'ownerPanel'])->name('owner.panel')->middleware('role:owner');
-        Route::delete('/collected/delete-all', 'destroyCollected')->name('destroyCollected')->middleware('role:owner');
+        // Specyficzne trasy przed dynamicznymi
+        Route::put('ready-ajax/{bike}', 'ajaxMarkReady')->name('ajaxReady');
+        Route::put('collected/{bike}', 'markAsCollected')->name('collected');
+        Route::put('complete/{bike}', 'complete')->name('complete');
+        Route::post('send-sms/{bike}', 'sendSms')->name('sendSms');
+        Route::delete('collected/delete-all', 'destroyCollected')->name('destroyCollected')->middleware('role:owner');
+        Route::get('owner-panel', 'ownerPanel')->name('owner.panel')->middleware('role:owner');
+        // Dynamiczne ID – zawsze na końcu!
+        Route::get('{bike}/edit', 'edit')->name('edit');
+        Route::get('{bike}', 'show')->name('show');
+        Route::put('{bike}', 'update')->name('update');
+        Route::delete('{bike}', 'destroy')->name('destroy');
     });
 
-// 🔍 Formularz do wyszukania roweru po QR (GET: pokaż formularz)
+// 🔍 QR wyszukiwanie
 Route::middleware(['auth'])->get('/qr-szukaj', function () {
     return view('bikes.qr-search');
 })->name('qr.search');
 
-// 🔍 Wyszukiwanie roweru po kodzie QR (POST: wykonaj przekierowanie)
 Route::middleware(['auth'])->post('/qr-szukaj', [CycleSyncHubController::class, 'findByQr'])->name('qr.lookup');
 
-// Po zalogowaniu
+// 📋 Dashboard i profil
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Profil użytkownika
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

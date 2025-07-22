@@ -23,6 +23,19 @@
         </form>
     @endif
 
+    @php
+        function translateAction($action) {
+            return match(strtolower($action)) {
+                'create' => 'Dodanie',
+                'edit', 'update' => 'Edycja',
+                'delete' => 'Usunięcie',
+                'status_change' => 'Zmiana statusu',
+                'sms_sent' => 'Wysłano SMS',
+                default => ucfirst(str_replace('_', ' ', $action)),
+            };
+        }
+    @endphp
+
     <div style="overflow-x:auto;">
         <table style="margin:0 auto; border-collapse:collapse; min-width:600px;">
             <tr style="background:#e3e3e3;">
@@ -33,10 +46,18 @@
             </tr>
             @forelse($logs as $log)
                 <tr>
-                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">{{ $log->created_at->format('d.m.Y H:i') }}</td>
-                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">{{ $log->user->name ?? 'System' }}</td>
-                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">{{ $log->action }}</td>
-                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">{{ $log->description }}</td>
+                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">
+                        {{ $log->created_at->format('d.m.Y H:i') }}
+                    </td>
+                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">
+                        {{ $log->user->name ?? 'System' }}
+                    </td>
+                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">
+                        {{ translateAction($log->action) }}
+                    </td>
+                    <td style="padding:4px 6px; border:1px solid #d0d0d0;">
+                        {{ str_replace(' (AJAX)', '', $log->description) }}
+                    </td>
                 </tr>
             @empty
                 <tr>
@@ -47,7 +68,10 @@
             @endforelse
         </table>
     </div>
-    <div style="margin-top:20px; text-align:center;">
-        {{ $logs->links() }}
+
+    <div style="margin-top: 24px; display: flex; justify-content: center;">
+        <div class="pagination-wrapper">
+            {{ $logs->onEachSide(1)->links('vendor.pagination.custom') }}
+        </div>
     </div>
 @endsection

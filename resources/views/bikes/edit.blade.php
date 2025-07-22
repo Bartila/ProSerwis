@@ -20,30 +20,22 @@
 
         <select name="type" required style="padding:2px 4px; border:1px solid #aaa; min-width:90px; font-size:13px;">
             <option value="">Typ roweru</option>
-            @foreach(['mtb', 'szosowy', 'cross', 'gravel', 'trekking', 'miejski'] as $type)
+            @foreach(['mtb', 'szosowy', 'cross', 'gravel', 'trekking', 'miejski', 'elektryczny'] as $type)
                 <option value="{{ $type }}" {{ old('type', $bike->type) === $type ? 'selected' : '' }}>{{ ucfirst($type) }}</option>
-            @endforeach
-        </select>
-
-        <select name="components" required style="padding:2px 4px; border:1px solid #aaa; min-width:110px; font-size:13px;">
-            <option value="">Podzespoły</option>
-            @foreach(['Campagnolo', 'SRAM', 'Shimano', 'Microshift', 'Inne'] as $comp)
-                <option value="{{ $comp }}" {{ old('components', $bike->components) === $comp ? 'selected' : '' }}>{{ $comp }}</option>
             @endforeach
         </select>
 
         <textarea name="info" placeholder="Opisz, co trzeba naprawić"
             style="padding:2px 4px; border:1px solid #aaa; min-width:160px; font-size:13px; min-height:32px;">{{ old('info', $bike->info) }}</textarea>
 
-        <input type="number" step="0.1" name="weight" value="{{ old('weight', $bike->weight) }}" placeholder="Waga (kg)"
-               style="padding:2px 4px; border:1px solid #aaa; min-width:70px; font-size:13px;">
-
         <input type="text" name="description" value="{{ old('description', $bike->description) }}" placeholder="Imię i nazwisko"
                required style="padding:2px 4px; border:1px solid #aaa; min-width:120px; font-size:13px;">
 
-        <input type="tel" name="phone" value="{{ old('phone', $bike->phone) }}" placeholder="+48XXXXXXXXX"
-               pattern="^\+48\d{9}$" required
-               style="padding:2px 4px; border:1px solid #aaa; min-width:130px; font-size:13px;">
+        <input type="tel" name="phone"
+            value="{{ old('phone', isset($bike) ? preg_replace('/^\+48/', '', $bike->phone) : '') }}"
+            placeholder="np. 501234567"
+            pattern="^\d{9}$" required
+            style="padding:2px 4px; border:1px solid #aaa; min-width:120px; font-size:13px;">
 
         <select name="status" required style="padding:2px 4px; border:1px solid #aaa; font-size:13px;">
             @foreach(['oczekuje', 'w naprawie', 'gotowy', 'odebrany'] as $status)
@@ -54,7 +46,6 @@
         <input type="date" name="deadline" value="{{ old('deadline', $bike->deadline) }}" placeholder="Termin"
                style="padding:2px 4px; border:1px solid #aaa; min-width:90px; font-size:13px;">
 
-        {{-- Kod QR dostępny dla KAŻDEGO zalogowanego --}}
         @auth
             <input type="text" name="qr_code" value="{{ old('qr_code', $bike->qr_code) }}" placeholder="Kod QR (skan lub wpisz)"
                    style="padding:2px 4px; border:1px solid #aaa; min-width:140px; font-size:13px;">

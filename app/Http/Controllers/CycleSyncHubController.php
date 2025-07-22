@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Bike;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Services\SmsService;
+use App\Models\BikeStat;
 
 class CycleSyncHubController extends Controller
 {
@@ -18,7 +20,7 @@ class CycleSyncHubController extends Controller
             $bikesQuery->where('name', 'like', "%{$q}%");
         }
 
-        $bikes = $bikesQuery->with('user')->orderBy('deadline', 'asc')->get();
+        $bikes = $bikesQuery->with('user')->orderBy('deadline', 'asc')->paginate(10);
 
         return view('bikes.index', compact('bikes', 'q'));
     }
@@ -28,29 +30,29 @@ class CycleSyncHubController extends Controller
         $request->validate([
             'name'        => 'required|string|max:255',
             'type'        => 'required|string|max:255',
-            'components'  => 'nullable|string|max:255',
             'info'        => 'nullable|string|max:100',
-            'weight'      => 'nullable|numeric|min:0',
             'description' => 'nullable|string|max:1000',
-            'phone'       => ['required', 'regex:/^\+48\d{9}$/'],
+            'phone'       => ['required', 'regex:/^\d{9}$/'],
             'status'      => 'required|string|max:30',
             'deadline'    => 'nullable|date',
             'qr_code'     => 'nullable|string|unique:bikes,qr_code',
         ]);
 
+        $phone = '+48' . preg_replace('/\D/', '', $request->phone);
+
         $bike = Bike::create([
             'name'        => $request->name,
             'type'        => $request->type,
             'user_id'     => Auth::id(),
-            'components'  => $request->components,
             'info'        => $request->info,
-            'weight'      => $request->weight,
             'description' => $request->description,
-            'phone'       => $request->phone,
+            'phone'       => $phone,
             'status'      => $request->status,
             'deadline'    => $request->deadline,
             'qr_code'     => $request->input('qr_code'),
         ]);
+
+        BikeStat::first()->increment('total_added');
 
         log_activity('add', 'Bike', $bike->id, 'Dodano rower: ' . $bike->name);
 
@@ -76,24 +78,22 @@ class CycleSyncHubController extends Controller
         $request->validate([
             'name'        => 'required|string|max:255',
             'type'        => 'required|string|max:255',
-            'components'  => 'nullable|string|max:255',
             'info'        => 'nullable|string|max:100',
-            'weight'      => 'nullable|numeric|min:0',
             'description' => 'nullable|string|max:1000',
-            'phone'       => ['required', 'regex:/^\+48\d{9}$/'],
+            'phone'       => ['required', 'regex:/^\d{9}$/'],
             'status'      => 'required|string|max:30',
             'deadline'    => 'nullable|date',
             'qr_code'     => 'nullable|string|unique:bikes,qr_code,' . $bike->id,
         ]);
 
+        $phone = '+48' . preg_replace('/\D/', '', $request->phone);
+
         $bike->update([
             'name'        => $request->name,
             'type'        => $request->type,
-            'components'  => $request->components,
             'info'        => $request->info,
-            'weight'      => $request->weight,
             'description' => $request->description,
-            'phone'       => $request->phone,
+            'phone'       => $phone,
             'status'      => $request->status,
             'deadline'    => $request->deadline,
             'qr_code'     => $request->input('qr_code'),
@@ -111,7 +111,28 @@ class CycleSyncHubController extends Controller
 
         log_activity('status_change', 'Bike', $id, 'Oznaczono rower jako gotowy');
 
-        return redirect()->route('cyclesynchub.index')->with('success', 'Rower oznaczony jako gotowy!');
+        return redirect()->route('cyclesynchub.index')->with('success', 'Rower oznaczony jako gotowy! Możesz teraz wysłać SMS.');
+    }
+
+    public function sendSms($id)
+    {
+        $bike = Bike::findOrFail($id);
+
+        if ($bike->status !== 'gotowy') {
+            return redirect()->back()->with('error', 'SMS można wysłać tylko gdy rower jest oznaczony jako gotowy.');
+        }
+
+        $userPhone = $bike->phone;
+        $smsMessage = "Twój rower \"{$bike->name}\" jest gotowy do odbioru. Dziękujemy – Salon Rowerowy Piątek.";
+
+        try {
+            (new SmsService())->send($userPhone, $smsMessage);
+            log_activity('sms_sent', 'Bike', $bike->id, 'Wysłano SMS do klienta.');
+            return redirect()->back()->with('success', 'SMS został wysłany!');
+        } catch (\Exception $e) {
+            logger()->error('Błąd wysyłki SMS: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Nie udało się wysłać SMS-a.');
+        }
     }
 
     public function markAsCollected($id)
@@ -155,14 +176,25 @@ class CycleSyncHubController extends Controller
         return redirect()->route('owner.panel')->with('success', "$deleted rower(ów) odebranych usunięto.");
     }
 
-    /**
-     * Obsługuje wyszukiwanie roweru po kodzie QR.
-     */
     public function findByQr(Request $request)
     {
         $code = $request->input('code');
         $bike = Bike::where('qr_code', $code)->firstOrFail();
 
         return redirect()->route('cyclesynchub.show', $bike->id);
+    }
+
+    public function ajaxMarkReady($id)
+    {
+        $bike = Bike::findOrFail($id);
+        $bike->update(['status' => 'gotowy']);
+
+        log_activity('status_change', 'Bike', $id, 'Oznaczono rower jako gotowy');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Rower oznaczony jako gotowy!',
+            'id' => $id
+        ]);
     }
 }

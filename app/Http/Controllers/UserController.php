@@ -7,9 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Routing\Controller;
 
-/**
- * Kontroler do zarządzania użytkownikami systemu (admin/owner).
- */
 class UserController extends Controller
 {
     public function __construct()
@@ -18,11 +15,9 @@ class UserController extends Controller
         $this->middleware(['auth', 'role:admin'])->except('index');
     }
 
-
     public function index()
     {
-        $users = User::all();
-
+        $users = User::orderBy('name')->paginate(5);
         return view('users.index', compact('users'));
     }
 
@@ -31,9 +26,6 @@ class UserController extends Controller
         return view('users.create');
     }
 
-    /**
-     * Zapisuje nowego użytkownika do bazy (tylko admin).
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -53,28 +45,33 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'Użytkownik dodany!');
     }
 
-    /**
-     * Formularz edycji wybranego użytkownika (tylko admin).
-     */
     public function edit(User $user)
     {
         return view('users.edit', compact('user'));
     }
 
-    /**
-     * Zapisuje zmiany w danych użytkownika (tylko admin).
-     */
     public function update(Request $request, User $user)
     {
-        $request->validate([
+        $rules = [
             'name'     => 'required|string|max:255',
             'password' => 'nullable|string|min:6|confirmed',
-        ]);
+        ];
 
-        $user->name = $request->name;
+        // Jeśli zalogowany użytkownik to admin, może zmieniać e-mail
+        if (auth()->user()->isAdmin()) {
+            $rules['email'] = 'required|email|unique:users,email,' . $user->id;
+        }
 
-        if (!empty($request->password)) {
-            $user->password = Hash::make($request->password);
+        $validated = $request->validate($rules);
+
+        $user->name = $validated['name'];
+
+        if (isset($validated['email'])) {
+            $user->email = $validated['email'];
+        }
+
+        if (!empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
         }
 
         $user->save();
@@ -82,10 +79,6 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'Użytkownik zaktualizowany!');
     }
 
-    /**
-     * Usuwa wybranego użytkownika z bazy (tylko admin).
-     * Admin nie może usunąć samego siebie
-     */
     public function destroy($id)
     {
         $user = User::findOrFail($id);

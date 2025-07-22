@@ -11,7 +11,8 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('users.update', $user->id) }}" style="max-width:400px; margin:0 auto; display:flex; flex-direction:column; gap:10px;">
+    <form method="POST" action="{{ route('users.update', $user->id) }}"
+          style="max-width:400px; margin:0 auto; display:flex; flex-direction:column; gap:10px;">
         @csrf
         @method('PUT')
 
@@ -20,6 +21,14 @@
             <input type="text" name="name" id="name" value="{{ old('name', $user->name) }}" required
                    style="width:100%; padding:6px; border:1px solid #aaa; border-radius:4px;">
         </div>
+
+        @if(auth()->user()->isAdmin())
+            <div>
+                <label for="email">Email:</label><br>
+                <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}" required
+                       style="width:100%; padding:6px; border:1px solid #aaa; border-radius:4px;">
+            </div>
+        @endif
 
         <div>
             <label for="password">Nowe hasło (opcjonalnie):</label><br>

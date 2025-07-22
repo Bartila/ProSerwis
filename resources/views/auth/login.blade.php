@@ -96,7 +96,7 @@
 <div class="login-wrapper">
     <div class="login-container">
         <div class="login-left">
-            <h1>CycleSyncHub</h1>
+            <h1>ProSerwis</h1>
         </div>
         <div class="login-right">
             <h2>Logowanie</h2>

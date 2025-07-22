@@ -59,4 +59,11 @@
             @endforeach
         </table>
     </div>
+
+    <div style="margin-top: 24px; display: flex; justify-content: center;">
+        <div class="pagination-wrapper">
+            {{ $users->onEachSide(1)->links('vendor.pagination.custom') }}
+        </div>
+    </div>
+
 @endsection
